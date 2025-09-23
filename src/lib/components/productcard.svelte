@@ -129,7 +129,7 @@ const fetchData = async () => {
     class:text-red-500={searchCategory === "tables_frames"}
     on:click={() => setCategory("tables_frames")}
   >
-    Table Frames
+    Table Frames 
   </button>
 </div>
 
