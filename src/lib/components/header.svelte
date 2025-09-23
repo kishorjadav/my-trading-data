@@ -43,18 +43,18 @@
 <header  use:clickOutside on:click_outside={handleClickOutside}>
   <nav>
     <div
-      class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-50 flex justify-between py-8"
+      class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8 relative z-50 flex justify-between py-6 md:py-8"
     >
       <div class="relative z-10 flex  justify-between w-full items-center gap-16">
         <a aria-label="Home" href="/"
           >
           <!-- <img class="h-40 w-auto" src="/images/TreasureOfMemories.png" alt="Treasure of Memories" /> -->
           <!-- <img src="/icons/logo1.svelte" alt="Logo" class="h-40 w-40" /> -->
-        <div class="flex gap-2 mx-5 md:mt-4"  >
-           <div class="md:h-28 w-16 h-16 md:w-28">
+        <div class="flex gap-2 md:mx-5 md:mt-4"  >
+           <div class="md:h-28 w-14 h-14 md:w-28">
            <Logo1/>
          </div>
-          <div class="md:h-32 w-16 h-16 md:w-32 -mt-5 md:mt-0"> <Logotext/></div>
+          <div class="md:h-32 w-10 h-10 md:w-32 -mt-7 md:mt-0"> <Logotext/></div>
         </div>
         
           <!-- <
