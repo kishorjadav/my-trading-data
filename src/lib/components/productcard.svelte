@@ -137,32 +137,38 @@ const fetchData = async () => {
       class="grid grid-cols-2 gap-2 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 2xl:grid-cols-4 lg:gap-x-8"
     >
           {#if items.length === 0}
-    <div class="flex justify-center w-full col-span-1 col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
+    <div class="flex justify-center w-full  col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
   {:else} 
 
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[410px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
           />
           {:else}
            <img
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
           />
           {/if}
           <hr class="border-gray-200" />
           <div class="flex flex-1 flex-col space-y-2 p-4">
              <p class="text-xs">#{item?.id}</p>
             <h3 class="text-sm font-medium text-gray-900">
-              <div>
+              <div class="md:sr-only">
+                <span aria-hidden="true" class="absolute inset-0"></span>
+                 {item?.name && item?.name.length > 30
+                    ? item?.name.slice(0, 30) + "..."
+                    : item?.name}
+              </div>
+               <div class="sr-only md:not-sr-only">
                 <span aria-hidden="true" class="absolute inset-0"></span>
                  {item?.name && item?.name.length > 90
                     ? item?.name.slice(0, 90) + "..."
