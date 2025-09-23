@@ -134,16 +134,16 @@ const fetchData = async () => {
 </div>
 
     <div
-      class="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 2xl:grid-cols-4 lg:gap-x-8"
+      class="grid grid-cols-2 gap-2 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 2xl:grid-cols-4 lg:gap-x-8"
     >
           {#if items.length === 0}
-    <div class="flex justify-center w-full col-span-1 sm:col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
+    <div class="flex justify-center w-full col-span-1 col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
   {:else} 
 
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
@@ -177,7 +177,9 @@ const fetchData = async () => {
                 <!-- <p>{item?.category}</p> -->
             <div class="flex flex-1 flex-col justify-end">
               <p class="text-sm italic text-gray-500">{item?.colors}</p>
-              <p class="text-sm italic text-green-500">Sizes: {item?.size}</p>
+              <p class="text-sm italic text-green-500">Sizes: {item?.size && item?.size.length > 15
+                    ? item?.size.slice(0, 15) + "..."
+                    : item?.size}</p>
               <p class="text-base font-medium text-gray-900">{item?.price} <span class="text-xs text-gray-500">MRP-<s>{item?.mrps}</s></span></p>
             </div>
           </div>

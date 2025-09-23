@@ -14,7 +14,11 @@
           <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Unique styles are finally here</h1>
           <p class="mt-4 text-xl text-gray-500">Every Photo Frame, Album, or Greeting card you purchase from us comes with built-in video technology. Simply scan any photo, and a video will instantly play on your mobile phone.
           </p>
+          <div class="mt-14 pb-10">
+             <a href="/store/products" class="   rounded-md border border-transparent mt-10 bg-gray-800 px-8 py-3 text-center font-medium text-white hover:bg-gray-600">Buy Photo Frames</a>
+          </div>
         </div>
+        
         <div>
           <div class="mt-10">
             <!-- Decorative image grid -->
@@ -52,9 +56,10 @@
               </div>
             </div>
 
-            <a href="/store/products" class="inline-block rounded-md border border-transparent bg-gray-800 px-8 py-3 text-center font-medium text-white hover:bg-gray-600">Buy Photo Frames</a>
+            <!-- <a href="/store/products" class="  sr-only md:not-sr-only rounded-md border border-transparent px-3 bg-gray-800 px-8 py-3 text-center font-medium text-white hover:bg-gray-600">Buy Photo Frames</a> -->
           </div>
         </div>
+        
       </div>
     </div>
   </header>
