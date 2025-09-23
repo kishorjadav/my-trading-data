@@ -54,7 +54,7 @@ const fetchData = async () => {
 
 
 <div class="bg-white">
-    <section aria-labelledby="sale-heading">
+    <section aria-labelledby="sale-heading" class=" sr-only md:not-sr-only">
       <div class="overflow-hidden pt-32 sm:pt-14">
         <div class="bg-gray-800">
           <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -114,7 +114,7 @@ const fetchData = async () => {
     <h2 class="sr-only">Products</h2>
     <!-- Buttons to change category -->
      
-<div class="flex gap-4 md:my-6 mb-10 md:mb-0">
+<div class="flex gap-4 -mt-16 md:my-6 mb-10 md:mb-0">
   <button
     class="px-4 py-2 border border-gray-500 text-black rounded"
     class:border-red-500={searchCategory === "wall_frames"}
@@ -143,19 +143,19 @@ const fetchData = async () => {
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 h-[415px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[370px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-40 sm:h-96"
           />
           {:else}
            <img
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-fill md:object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-fill md:object-cover group-hover:opacity-75 sm:aspect-auto h-40 sm:h-96"
           />
           {/if}
           <hr class="border-gray-200" />
