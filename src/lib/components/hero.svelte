@@ -21,7 +21,7 @@
       <div
         class="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6"
       >
-        <h1 class="text-4xl font-medium tracking-tight text-gray-900">
+        <h1 class="text-2xl font-semibold md:text-4xl  tracking-tight text-gray-900">
           We Frame Your Memories into One Beautiful Stories for Lifetime.
         </h1>
         <p class="mt-6 text-lg text-gray-600">
@@ -304,11 +304,11 @@
 <section
   id="secondary-features"
   aria-label="Features for building a portfolio"
-  class="py-20 sm:py-32"
+  class="pb-10 sm:py-32"
 >
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div class="mx-auto max-w-2xl sm:text-center">
-      <h2 class="text-3xl font-medium tracking-tight text-gray-900">
+      <h2 class="text-2xl font-semibold md:text-3xl  tracking-tight text-gray-900">
         Features of Treasure of Memories
       </h2>
       <p class="mt-2 text-lg text-gray-600">
@@ -342,7 +342,7 @@
             fill-opacity="0.2"
           ></circle></svg
         >
-        <h3 class="mt-6 text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">Integration</h3>
+        <h3 class="mt-6 text-xl md:text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">Integration</h3>
         <p class="mt-2 text-base text-gray-700">
           Turn your printed or digital photos into living video memories. Just
           scan a photo with your phone and watch it instantly come alive with
@@ -384,7 +384,7 @@
             ></defs
           ></svg
         >
-        <h3 class="mt-6 text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">
+        <h3 class="mt-6 text-xl md:text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">
           Instant Photo-to-Video Sync
         </h3>
         <p class="mt-2 text-base text-gray-700">
@@ -408,7 +408,7 @@
             fill="#171717"
           ></path></svg
         >
-        <h3 class="mt-6 text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">
+        <h3 class="mt-6 text-xl md:text-2xl font-semibold text-[oklch(58.8%_0.158_241.966)]">
           Bring the Magic to Life
         </h3>
         <p class="mt-2 text-base text-gray-700">
@@ -426,7 +426,7 @@
 <section
   id="features"
   aria-label="Features for investing all your money"
-  class="bg-gray-900 py-20 sm:py-32"
+  class="bg-gray-900 py-10 sm:py-32"
 >
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
     <div
@@ -1105,7 +1105,7 @@
 <!-- section 4 -->
 <section
   id="get-free-shares-today"
-  class="relative overflow-hidden bg-gray-900 py-20 sm:py-28"
+  class="relative overflow-hidden bg-gray-900 py-0 sm:py-28"
 >
   <div
     class="absolute top-1/2 left-20 -translate-y-1/2 sm:left-1/2 sm:-translate-x-1/2"
@@ -1144,19 +1144,19 @@
   </div>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
     <div class="mx-auto max-w-md sm:text-center">
-      <h2 class="text-3xl font-medium tracking-tight text-white sm:text-4xl">
+      <h2 class="text-2xl md:text-3xl font-medium tracking-tight text-white sm:text-4xl">
         Why Choose Us ?
       </h2>
-      <p class="mt-4 text-lg text-gray-300">
+      <p class="mt-4 text-sm md:text-lg text-gray-300">
         ✔ Designed for lasting beauty and durability
       </p>
-       <p class="mt-4 text-lg text-gray-300">
+       <p class="mt-4 text-sm md:text-lg text-gray-300">
          ✔ Perfect for home decor and gifts for every occasion
       </p>
-       <p class="mt-4 text-lg text-gray-300">
+       <p class="mt-4 text-sm md:text-lg text-gray-300">
         ✔ Easy customization and hassle-free ordering
       </p>
-       <p class="mt-4 text-lg text-gray-300">
+       <p class="mt-4 text-sm md:text-lg text-gray-300">
        ✔ Crafted with care and attention to detail
       </p>
       <div class="mt-8 flex justify-center">
