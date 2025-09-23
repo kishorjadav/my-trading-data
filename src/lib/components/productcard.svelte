@@ -110,7 +110,7 @@ const fetchData = async () => {
         </div>
       </div>
     </section>
-  <div class="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-10 lg:max-w-7xl lg:px-8">
+  <div class="mx-auto max-w-2xl px-2 py-16 sm:px-6 sm:py-10 lg:max-w-7xl lg:px-8">
     <h2 class="sr-only">Products</h2>
     <!-- Buttons to change category -->
      
@@ -134,7 +134,7 @@ const fetchData = async () => {
 </div>
 
     <div
-      class="grid grid-cols-2 gap-2 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 2xl:grid-cols-4 lg:gap-x-8"
+      class="grid grid-cols-2 gap-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:grid-cols-3 2xl:grid-cols-4 lg:gap-x-8"
     >
           {#if items.length === 0}
     <div class="flex justify-center w-full  col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
@@ -143,7 +143,7 @@ const fetchData = async () => {
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 h-[410px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[415px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
@@ -155,17 +155,17 @@ const fetchData = async () => {
            <img
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-fill md:object-cover group-hover:opacity-75 sm:aspect-auto h-60 sm:h-96"
           />
           {/if}
           <hr class="border-gray-200" />
-          <div class="flex flex-1 flex-col space-y-2 p-4">
+          <div class="flex flex-1 flex-col space-y-2 p-2 md:p-4">
              <p class="text-xs">#{item?.id}</p>
             <h3 class="text-sm font-medium text-gray-900">
               <div class="md:sr-only">
                 <span aria-hidden="true" class="absolute inset-0"></span>
-                 {item?.name && item?.name.length > 30
-                    ? item?.name.slice(0, 30) + "..."
+                 {item?.name && item?.name.length > 80
+                    ? item?.name.slice(0, 80) + "..."
                     : item?.name}
               </div>
                <div class="sr-only md:not-sr-only">
@@ -183,7 +183,7 @@ const fetchData = async () => {
                 <!-- <p>{item?.category}</p> -->
             <div class="flex flex-1 flex-col justify-end">
               <p class="text-sm italic text-gray-500">{item?.colors}</p>
-              <p class="text-sm italic text-green-500">Sizes: {item?.size && item?.size.length > 15
+              <p class="text-xs md:text-sm italic text-green-500">Sizes: {item?.size && item?.size.length > 15
                     ? item?.size.slice(0, 15) + "..."
                     : item?.size}</p>
               <p class="text-base font-medium text-gray-900">{item?.price} <span class="text-xs text-gray-500">MRP-<s>{item?.mrps}</s></span></p>
