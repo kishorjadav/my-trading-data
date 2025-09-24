@@ -164,8 +164,8 @@ const fetchData = async () => {
             <h3 class="text-sm font-medium text-gray-900">
               <div class="md:sr-only">
                 <span aria-hidden="true" class="absolute inset-0"></span>
-                 {item?.name && item?.name.length > 80
-                    ? item?.name.slice(0, 80) + "..."
+                 {item?.name && item?.name.length > 70
+                    ? item?.name.slice(0, 70) + "..."
                     : item?.name}
               </div>
                <div class="sr-only md:not-sr-only">
@@ -186,7 +186,8 @@ const fetchData = async () => {
               <p class="text-xs md:text-sm italic text-green-500">Sizes: {item?.size && item?.size.length > 15
                     ? item?.size.slice(0, 15) + "..."
                     : item?.size}</p>
-              <p class="text-base font-medium text-gray-900">{item?.price} <span class="text-xs text-gray-500">MRP-<s>{item?.mrps}</s></span></p>
+              <p class="text-base font-medium text-gray-900">{item?.price} </p>
+              <span class="text-xs text-gray-500">MRP-<s>{item?.mrps}</s></span>
             </div>
           </div>
         </div>

@@ -5,7 +5,7 @@
 
     <main class="isolate">
         <!-- CTA section -->
-        <div class="pt-32 overflow-hidden sm:pt-40">
+        <div class="pt-16 overflow-hidden sm:pt-40">
             <div class="mx-auto max-w-7xl px-6 lg:flex lg:px-8">
                 <div
                     class="mx-auto grid max-w-2xl grid-cols-1 gap-x-12 gap-y-16 lg:mx-0 lg:min-w-full lg:max-w-none lg:flex-none lg:gap-y-8"
@@ -18,7 +18,7 @@
 
                         </h2>
                         <p
-                            class="mt-6 text-xl/8 text-gray-700 dark:text-gray-300"
+                            class="mt-6 text-pretty text-lg font-medium text-gray-500 sm:max-w-md sm:text-xl/8 lg:max-w-none"
                         >
                             Treasure of Memories is a brand dedicated to preserving life’s most meaningful moments through thoughtful, high-quality creations. We believe every memory is a treasure, and our products are designed to capture emotions, celebrate milestones, and create lasting keepsakes for families and loved ones. With a focus on quality, personalization, and care, Treasure of Memories goes beyond gifting to deliver experiences that stay close to the heart forever.
                         </p>

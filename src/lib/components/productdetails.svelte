@@ -60,7 +60,7 @@ function openDialog() {
        <div class="flex justify-center w-full col-span-1 sm:col-span-2 lg:col-span-3 2xl:col-span-4"><Loading/></div>
 
    {:else}
-  <div class="mx-auto max-w-2xl px-4 md:py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
+  <div class="mx-auto max-w-2xl px-2 md:py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
     <div class="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-8">
       <!-- Image gallery -->
       <div class="flex flex-col-reverse">
@@ -98,7 +98,7 @@ function openDialog() {
 
       <!-- Product info -->
       <div class="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
-        <h1 class="text-3xl font-bold tracking-tight text-gray-900">{items[0]?.name}</h1>
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">{items[0]?.name}</h1>
 
         <div class="mt-3">
           <h2 class="sr-only">Product information</h2>
@@ -112,15 +112,15 @@ function openDialog() {
           <h3 class="sr-only">Description</h3>
 
           <div class="space-y-6 mt-5 text-base text-gray-600 ">
-            <p class="pb-10">{@html items[0]?.description}</p>
-             <p class="pb-10">{items[0]?.sizes}</p>
+            <p class="pb-0">{@html items[0]?.description}</p>
+             <p class="pb-0 text-orange-400">Size: {items[0]?.sizes}</p>
           </div>
         </div>
 
-    <hr class="my-10 border-t border-gray-100" />
+    <hr class="my-0 border-t border-gray-100" />
 
 
-        <section aria-labelledby="details-heading" class="mt-12">
+        <section aria-labelledby="details-heading" class="mt-0">
           <h2 id="details-heading" class="sr-only">Additional details</h2>
 
           <div class="divide-y divide-gray-200  border-gray-200">

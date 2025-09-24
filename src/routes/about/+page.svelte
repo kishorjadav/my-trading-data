@@ -28,7 +28,7 @@
         <div style="clip-path: polygon(63.1% 29.5%, 100% 17.1%, 76.6% 3%, 48.4% 0%, 44.6% 4.7%, 54.5% 25.3%, 59.8% 49%, 55.2% 57.8%, 44.4% 57.2%, 27.8% 47.9%, 35.1% 81.5%, 0% 97.7%, 39.2% 100%, 35.2% 81.4%, 97.2% 52.8%, 63.1% 29.5%)" class="aspect-[801/1036] w-[50.0625rem] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30"></div>
       </div>
       <div class="overflow-hidden">
-        <div class="mx-auto max-w-7xl px-6 pb-32 pt-36 sm:pt-60 lg:px-8 lg:pt-32">
+        <div class="mx-auto max-w-7xl px-6 pb-32 pt-16 sm:pt-60 lg:px-8 lg:pt-32">
           <div class="mx-auto max-w-2xl gap-x-14 lg:mx-0 lg:flex lg:max-w-none lg:items-center">
             <div class="relative w-full lg:max-w-xl lg:shrink-0 xl:max-w-2xl">
               <h1 class="text-pretty text-5xl font-semibold tracking-tight text-gray-900 sm:text-7xl dark:text-white">We’re changing the way you connect with your memories.</h1>
@@ -75,9 +75,9 @@
         <h2 class="text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">Our mission</h2>
         <div class="mt-6 flex flex-col gap-x-8 gap-y-20 lg:flex-row">
           <div class="lg:w-full lg:max-w-2xl lg:flex-auto">
-            <p class="text-xl/8 text-gray-600 dark:text-gray-300">At the heart of our mission is the desire to help you relive your favorite memories every single day. We believe that every photo carries a story, every video holds an emotion, and every moment deserves to be remembered in a way that feels alive and personal. That’s why we go beyond traditional photo keeping—by crafting experiences that merge the beauty of physical keepsakes with the innovation of digital storytelling.
+            <p class=" text-pretty text-lg font-medium text-gray-500 sm:max-w-md sm:text-xl/8 lg:max-w-none">At the heart of our mission is the desire to help you relive your favorite memories every single day. We believe that every photo carries a story, every video holds an emotion, and every moment deserves to be remembered in a way that feels alive and personal. That’s why we go beyond traditional photo keeping—by crafting experiences that merge the beauty of physical keepsakes with the innovation of digital storytelling.
 </p>
-            <p class="mt-10 max-w-xl text-base/7 text-gray-700 dark:text-gray-400"> We create thoughtfully designed photo frames and albums that highlight your most meaningful milestones, blending elegance, style, and personalization. Each creation is more than just a frame—it’s a timeless treasure built to preserve the essence of your journey. With seamless technology and artistic craftsmanship, our mission is to make sure your memories remain as vivid, emotional, and unforgettable as the day they were made.</p>
+            <p class="mt-10 text-pretty text-lg font-medium text-gray-500 sm:max-w-md sm:text-xl/8 lg:max-w-none"> We create thoughtfully designed photo frames and albums that highlight your most meaningful milestones, blending elegance, style, and personalization. Each creation is more than just a frame—it’s a timeless treasure built to preserve the essence of your journey. With seamless technology and artistic craftsmanship, our mission is to make sure your memories remain as vivid, emotional, and unforgettable as the day they were made.</p>
           </div>
           <div class="lg:flex lg:flex-auto lg:justify-center">
             <dl class="w-64 space-y-8 xl:w-80">
@@ -199,20 +199,20 @@
       </ul>
     </div> -->
 
-      <div class="mx-auto mt-32 pb-20 max-w-7xl px-6 sm:mt-32 lg:px-8">
+      <div class="mx-auto mt-16 pb-20 max-w-7xl px-6 sm:mt-32 lg:px-8">
       <div class="mx-auto max-w-3xl lg:mx-0">
         <h2 class="text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">Meet the Makers</h2>
-        <p class="mt-6 text-lg/8 text-gray-600 dark:text-gray-400">Behind every frame stands a team driven by creativity and passion. We combine craftsmanship with care to ensure lasting quality, designing every detail to highlight the beauty of your memories. Our greatest joy comes from helping you transform photographs into timeless pieces that add warmth, personality, and a sense of home to your space.</p>
+        <p class="mt-6 text-pretty text-lg font-medium text-gray-500 sm:max-w-md sm:text-xl/8 lg:max-w-none">Behind every frame stands a team driven by creativity and passion. We combine craftsmanship with care to ensure lasting quality, designing every detail to highlight the beauty of your memories. Our greatest joy comes from helping you transform photographs into timeless pieces that add warmth, personality, and a sense of home to your space.</p>
       </div>
-        <div class="mx-auto mt-32 pb-20 max-w-7xl px-1 sm:mt-32 lg:px-0">
+        <div class="mx-auto mt-16 pb-20 max-w-7xl px-1 sm:mt-32 lg:px-0">
       <div class="mx-auto max-w-3xl lg:mx-0">
         <h2 class="text-pretty text-4xl font-semibold tracking-tight text-gray-900 sm:text-5xl dark:text-white">What We Stand For
 </h2>
-        <p class="mt-6 text-lg/8 text-gray-600 dark:text-gray-400">At the core of our mission is a commitment to providing frames that seamlessly blend beauty with functionality. Each piece we create is designed not just to display photos, but to enhance your living spaces, bringing warmth, joy, and cherished memories to every corner. We believe that every frame should tell a story, reflecting the love, laughter, and special moments that make life meaningful. With simple and intuitive customization options, you can personalize each frame to suit your unique style and taste. Coupled with our exceptional customer service, we are dedicated to guiding and supporting you at every step, ensuring that your experience is as memorable as the moments you choose to preserve.</p>
+        <p class="mt-6 text-pretty text-lg font-medium text-gray-500 sm:max-w-md sm:text-xl/8 lg:max-w-none">At the core of our mission is a commitment to providing frames that seamlessly blend beauty with functionality. Each piece we create is designed not just to display photos, but to enhance your living spaces, bringing warmth, joy, and cherished memories to every corner. We believe that every frame should tell a story, reflecting the love, laughter, and special moments that make life meaningful. With simple and intuitive customization options, you can personalize each frame to suit your unique style and taste. Coupled with our exceptional customer service, we are dedicated to guiding and supporting you at every step, ensuring that your experience is as memorable as the moments you choose to preserve.</p>
       </div>
      
     </div>
-
+</div>
    
   </main>
 
