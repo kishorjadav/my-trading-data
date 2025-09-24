@@ -11,11 +11,12 @@
     <div class="pb-80 pt-0 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
       <div class="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
         <div class="sm:max-w-lg">
+          <p class="text-xl md:text-2xl pb-4 font-semibold text-pink-500">Every Frames has BuiltIn Video Technology</p>
           <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Unique styles are finally here</h1>
           <p class="mt-4 text-xl text-gray-500">Every Photo Frame, Album, or Greeting card you purchase from us comes with built-in video technology. Simply scan any photo, and a video will instantly play on your mobile phone.
           </p>
           <div class="mt-14 pb-10">
-             <a href="/store/products" class="   rounded-md border border-transparent mt-10 bg-gray-800 px-8 py-3 text-center font-medium text-white hover:bg-gray-600">Buy Photo Frames</a>
+             <a href="/store/products" class="   rounded-md border border-transparent mt-10 bg-pink-600 px-8 py-3 text-center font-medium text-white hover:bg-gray-600">Buy Photo Frames</a>
           </div>
         </div>
         
@@ -70,7 +71,7 @@
       <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div class="sm:flex sm:items-baseline sm:justify-between">
           <h2 id="category-heading" class="text-2xl font-bold tracking-tight text-gray-900">Shop by Category</h2>
-          <a href="/store/products" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
+          <a href="/store/products" class="hidden text-sm font-semibold text-pink-600 hover:text-pink-500 sm:block">
             Browse all categories
             <span aria-hidden="true"> &rarr;</span>
           </a>
@@ -154,7 +155,7 @@
       <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
         <div class="sm:flex sm:items-baseline sm:justify-between">
           <h2 id="favorites-heading" class="text-2xl font-bold tracking-tight text-gray-900">Our Favorites</h2>
-          <a href="/store/products" class="hidden text-sm font-semibold text-indigo-600 hover:text-indigo-500 sm:block">
+          <a href="/store/products" class="hidden text-sm font-semibold text-pink-600 hover:text-pink-500 sm:block">
             Browse all favorites
             <span aria-hidden="true"> &rarr;</span>
           </a>

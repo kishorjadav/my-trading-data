@@ -21,9 +21,11 @@
       <div
         class="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6"
       >
+       
         <h1 class="text-2xl font-semibold md:text-4xl  tracking-tight text-gray-900">
           We Frame Your Memories into One Beautiful Stories for Lifetime.
         </h1>
+        <p class="text-xl md:text-xl pt-4 font-semibold text-pink-500">Every Frames has BuiltIn Video Technology</p>
         <p class="mt-6 text-lg text-gray-600">
           Make every memories unforgettable with Frames, Albums and Books that
           tells you a story behind every photo.
