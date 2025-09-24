@@ -112,7 +112,7 @@ function openDialog() {
           <h3 class="sr-only">Description</h3>
 
           <div class="space-y-6 mt-5 text-base text-gray-600 ">
-            <p class="pb-10">{items[0]?.description}</p>
+            <p class="pb-10">{@html items[0]?.description}</p>
              <p class="pb-10">{items[0]?.sizes}</p>
           </div>
         </div>
@@ -135,7 +135,7 @@ function openDialog() {
               <el-disclosure id="detail-0" class="[&:not([hidden])]:contents">
                 <div class="pb-6">
                   <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-gray-700 marker:text-gray-300">
-                    <li class="pl-2">{items[0]?.features}</li>
+                    <li class="pl-2">{@html items[0]?.features}</li>
                   
                   </ul>
                 </div>
