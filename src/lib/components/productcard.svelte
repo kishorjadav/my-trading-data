@@ -143,19 +143,19 @@ const fetchData = async () => {
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 h-[370px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[390px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-40 sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-cover group-hover:opacity-75 sm:aspect-auto h-[200px] sm:h-96"
           />
           {:else}
            <img
             src={item?.image}
             alt={item?.name}
-            class="aspect-[3/4] w-full bg-gray-200 object-fill md:object-cover group-hover:opacity-75 sm:aspect-auto h-40 sm:h-96"
+            class="aspect-[3/4] w-full bg-gray-200 object-fill md:object-cover group-hover:opacity-75 sm:aspect-auto h-[200px] sm:h-96"
           />
           {/if}
           <hr class="border-gray-200" />
