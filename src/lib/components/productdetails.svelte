@@ -97,7 +97,7 @@ function openDialog() {
     </div>
 
       <!-- Product info -->
-      <div class="mt-10 px-4 sm:mt-16 sm:px-0 lg:mt-0">
+      <div class="mt-10 px-3  sm:mt-16 sm:px-4 lg:mt-0">
         <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">{items[0]?.name}</h1>
 
         <div class="mt-3">
