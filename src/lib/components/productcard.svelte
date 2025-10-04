@@ -61,7 +61,7 @@ const fetchData = async () => {
             <div class="relative pb-16 pt-48 sm:pb-24">
               <div>
                 <h2 id="sale-heading" class="text-4xl font-bold tracking-tight text-white md:text-4xl">
-                  From Still Photo to Thrill Photo 
+                  From Still Photo to Thrill Video 
                   <br />
                  
                 </h2>
@@ -143,7 +143,7 @@ const fetchData = async () => {
       {#each items as item}
       <a href="/store/products/{item.id}">
         <div
-          class="group md:my-20 h-[390px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+          class="group md:my-20 h-[405px] md:h-[510px] relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
         >
             {#if item?.image_type==="drive"}
           <iframe
@@ -160,7 +160,10 @@ const fetchData = async () => {
           {/if}
           <hr class="border-gray-200" />
           <div class="flex flex-1 flex-col space-y-2 p-2 md:p-4">
-             <p class="text-xs">#{item?.id}</p>
+             <div class="flex justify-between ">
+              <div><p class="text-xs">#{item?.id}</p></div>
+              <div class="text-red-500 text-xs font-semibold">Photo Frame + Video</div>
+             </div>
             <h3 class="text-sm font-medium text-gray-900">
               <div class="md:sr-only">
                 <span aria-hidden="true" class="absolute inset-0"></span>
