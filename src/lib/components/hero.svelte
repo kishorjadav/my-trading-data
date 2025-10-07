@@ -6,13 +6,15 @@
   import Canva from "./canva.svelte";
   let videoId = "zFJGhSTidS4";
   let videoId2 = "trGOOiRwu54";
+  //let videoId2 = "trGOOiRwu54";
   
   let src1 = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}`;
   let src2 = `https://www.youtube.com/embed/${videoId2}?autoplay=1&mute=1&loop=1&playlist=${videoId2}`;
-  let src3 = `https://www.youtube.com/embed/${'dyFxDyMwx8I'}?autoplay=1&mute=1&loop=1&playlist=${'dyFxDyMwx8I'}`;
+  let src3 = `https://www.youtube.com/embed/${'9ivRW_Mfu2I'}?autoplay=1&mute=1&loop=1&playlist=${'9ivRW_Mfu2I'}`;
   // https://youtube.com/shorts/dyFxDyMwx8I
 
   // https://youtube.com/shorts/trGOOiRwu54?feature=share
+  //https://youtube.com/shorts/9ivRW_Mfu2I?si=Vy2VvFQGHjk9_j3H
 </script>
 
 <div class="overflow-hidden md:py-20 lg:pb-32 xl:pb-36">
