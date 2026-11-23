@@ -198,6 +198,36 @@
     };
   }
 
+  // Evaluates PCR and returns Trend label + badge classes
+  function getTrendInfo(pcrStr) {
+    const pcr = parseFloat(pcrStr);
+    if (Number.isNaN(pcr)) {
+      return { label: "-", badgeClass: "text-gray-400" };
+    }
+    if (pcr >= 1.98 || pcr >= 2) {
+      return {
+        label: "Buy",
+        badgeClass: "inline-flex items-center rounded-md bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
+      };
+    }    
+    if (pcr <= 0.50 || pcr <=0.52 ) {
+      return {
+        label: "Sell",
+        badgeClass: "inline-flex items-center rounded-md bg-pink-100 px-2 py-1 text-xs font-medium text-pink-700"
+      };
+    }
+    if (pcr < 1.97 && pcr > 0.53) {
+      return {
+        label: "Neutral",
+        badgeClass: "inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800"
+      };
+    }
+    return {
+      label: "-",
+      badgeClass: "inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600"
+    };
+  }
+
   // Finds the single nearest row per date for each target time within MAX_TIME_DIFF_MINUTES
   function buildHighlightedRowKeys(sourceRows) {
     const matchedKeys = new Set();
@@ -283,6 +313,7 @@
           const dt = parseTimestampToDate(rawTs);
           const { dateFull, dateShort, timeFormatted } = splitDateAndTime12Hr(rawTs);
           const dateKey = toIsoDateKey(dt);
+          const pcrVal = cols[3] || "";
 
           return {
             rowKey: `${dateKey}__${rawTs}__${index}`,
@@ -293,7 +324,8 @@
             timeFormatted,
             totCallsM: cols[1] || "",
             totPutsM: cols[2] || "",
-            pcr: cols[3] || "",
+            pcr: pcrVal,
+            trend: getTrendInfo(pcrVal),
             maxPain: cols[4] || ""
           };
         })
@@ -499,12 +531,6 @@
                     scope="col"
                     class="py-3 pl-3 pr-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-6 sm:pr-3 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
-                    Date
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
                     Time (IST)
                   </th>
                   <th
@@ -527,6 +553,12 @@
                   </th>
                   <th
                     scope="col"
+                    class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
+                  >
+                    Trend
+                  </th>
+                  <th
+                    scope="col"
                     class="py-3 pl-2 pr-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-3 sm:pr-6 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
                     Max Pain
@@ -536,11 +568,7 @@
               <tbody class="divide-y divide-gray-200 bg-white">
                 {#each rows as r}
                   <tr class={getRowHighlight(r)}>
-                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs font-medium text-gray-600 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
-                      <span class="sm:hidden">{r.dateShort}</span>
-                      <span class="hidden sm:inline">{r.dateFull}</span>
-                    </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
+                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs text-gray-600 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
                       {r.timeFormatted}
                     </td>
                     <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
@@ -551,6 +579,9 @@
                     </td>
                     <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
                       {r.pcr}
+                    </td>
+                    <td class="whitespace-nowrap text-center px-2 py-3 text-xs sm:px-3 sm:py-4 sm:text-sm">
+                      <span class={r.trend.badgeClass}>{r.trend.label}</span>
                     </td>
                     <td class="whitespace-nowrap py-3 pl-2 pr-3 text-right text-xs font-medium text-gray-600 sm:py-4 sm:pl-3 sm:pr-6 sm:text-sm">
                       {r.maxPain}
