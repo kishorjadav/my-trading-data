@@ -16,23 +16,23 @@
       route: "/home",
   
     },
-     {
-      label: "Store",
-      route: "/store",
+    //  {
+    //   label: "Store",
+    //   route: "/store",
   
-    },
-    {
-      label: "About Us",
-      route: "/about",
-    },
-     {
-      label: "FAQ's",
-      route: "/faqs",
-    },
-    {
-      label: "Contact Us",
-      route: "/contact",
-    },
+    // },
+    // {
+    //   label: "About Us",
+    //   route: "/about",
+    // },
+    //  {
+    //   label: "FAQ's",
+    //   route: "/faqs",
+    // },
+    // {
+    //   label: "Contact Us",
+    //   route: "/contact",
+    // },
   ]
 
    $: path = $page.url.pathname;
@@ -54,7 +54,7 @@
            <div class="md:h-28 w-14 h-14 md:w-28">
            <Logo1/>
          </div>
-          <div class="md:h-32 w-10 h-10 md:w-32 -mt-7 md:mt-0"> <Logotext/></div>
+          <div class="md:h-32 w-10 h-10 md:w-32 -mt-7 md:mt-0"> My Trading Data</div>
         </div>
         
           <!-- <

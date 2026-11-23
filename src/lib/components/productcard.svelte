@@ -54,18 +54,19 @@ const fetchData = async () => {
 
 
 <div class="bg-white">
-    <section aria-labelledby="sale-heading" class=" sr-only md:not-sr-only">
-      <div class="overflow-hidden pt-32 sm:pt-14">
-        <div class="bg-gray-800">
+    <section aria-labelledby="sale-heading" class=" ">
+      <div class="overflow-hidden pt-0 sm:pt-14">
+        <div class="sm:bg-gray-800">
           <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="relative pb-16 pt-48 sm:pb-24">
+            <div class="relative pb-0 sm:pt-24 sm:pb-24">
               <div>
-                <h2 id="sale-heading" class="text-4xl font-bold tracking-tight text-white md:text-4xl">
+                <h2 id="sale-heading" class="text-xl sm:text-4xl font-bold tracking-tight sm:text-white md:text-4xl">
                   From Still Photo to Thrill Video 
                   <br />
                  
                 </h2>
-                <p class="text-white text-2xl mt-10"> Photo + Frames + Live Video</p>
+                <p class="sm:text-white sm:text-2xl mt-3 sm:mt-10"> Photo + Frames + Live Video</p>
+                 <p class="sm:text-white sm:text-2xl mt-3 sm:mt-10"> Albums + Video Technology</p>
                 <div class="mt-6 text-base">
                   <!-- <a href="/store/products" class="font-semibold text-white">
                     Shop the sale
@@ -74,7 +75,8 @@ const fetchData = async () => {
                 </div>
               </div>
 
-              <div class="absolute -top-32 left-1/2 -translate-x-1/2 transform sm:top-6 sm:translate-x-0">
+              <div class="sr-only sm:not-sr-only">
+              <div class="absolute  -top-32 left-1/2 -translate-x-1/2 transform sm:top-6 sm:translate-x-0">
                 <div class="ml-24 flex min-w-max space-x-6 sm:ml-3 lg:space-x-8">
                   <div class="flex space-x-6 sm:flex-col sm:space-x-0 sm:space-y-6 lg:space-y-8">
                     <div class="shrink-0">
@@ -105,6 +107,7 @@ const fetchData = async () => {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
           </div>
         </div>
@@ -130,6 +133,14 @@ const fetchData = async () => {
     on:click={() => setCategory("tables_frames")}
   >
     Table Frames  
+  </button>
+  <button
+    class="px-4 py-2 border border-gray-500 text-black rounded"
+    class:border-red-500={searchCategory === "albums"}
+    class:text-red-500={searchCategory === "albums"}
+    on:click={() => setCategory("albums")}
+  >
+    Albums  
   </button>
 </div>
 
