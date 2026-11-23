@@ -102,7 +102,9 @@ function openDialog() {
 
         <div class="mt-3">
           <h2 class="sr-only">Product information</h2>
+         
           <p class="text-3xl tracking-tight text-gray-900">{items[0]?.selling_price} <span class="text-xs text-gray-500">MRP-<s>{items[0]?.mrp}</s></span></p>
+         
         </div>
 
         <!-- Reviews -->
@@ -113,7 +115,7 @@ function openDialog() {
 
           <div class="space-y-6 mt-5 text-base text-gray-600 ">
             <p class="pb-0">{@html items[0]?.description}</p>
-             <p class="pb-0 text-orange-400">Size: {items[0]?.sizes}</p>
+             <p class="pb-0 text-orange-400">{items[0]?.category === 'albums' ? '':'Size:'} {@html  items[0]?.sizes}</p>
           </div>
         </div>
 
@@ -124,7 +126,7 @@ function openDialog() {
           <h2 id="details-heading" class="sr-only">Additional details</h2>
 
           <div class="divide-y divide-gray-200  border-gray-200">
-            {#if items[0]?.features != ''}
+            {#if items[0]?.features != '' }
             <div>
               <h3>
                 <button type="button" command="--toggle" commandfor="detail-0" class="group relative flex w-full items-center justify-between py-6 text-left">
@@ -151,7 +153,7 @@ function openDialog() {
               </h3>
             <div class="pb-6">
                   <ul role="list" class="list-disc space-y-1 pl-5 text-sm/6 text-gray-700 marker:text-gray-300">
-                    <li class="pl-2">{items[0]?.total_photos} Photo -> Frame -> {items[0]?.total_videos} Video access for lifetime</li>
+                    <li class="pl-2">{items[0]?.total_photos} Photo -> {items[0]?.category === 'albums' ? 'Album' : 'Frame'}  -> {items[0]?.total_videos} Video access for lifetime</li>
                    
                   </ul>
                 </div>

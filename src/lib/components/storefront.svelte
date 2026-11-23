@@ -47,7 +47,7 @@
                   </div>
                   <div class="grid shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
                     <div class="h-64 w-44 overflow-hidden rounded-lg">
-                      <img src="https://www.tescophoto.com/media/catalog/product/cache/207e23213cf636ccdef205098cf3c8a3/2/4/24_0364_30_p-37_1.jpg" alt="" class="size-full object-cover" />
+                      <img src="https://homafy.com/wp-content/uploads/2023/03/love-photo-frame.jpg" alt="" class="size-full object-cover" />
                     </div>
                     <div class="h-64 w-44 overflow-hidden rounded-lg">
                       <img src="https://riverandcoast.co.uk/wp-content/uploads/2024/08/Name-Frame_Personalised-PhotoFrame_Personalised-Frame_Text-Frame-3-768x1024.jpg" alt="" class="size-full object-cover" />

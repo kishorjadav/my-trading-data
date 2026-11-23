@@ -17,12 +17,12 @@
                    
                 </div>
                  <div class="ml-4 mt-5 w-full">
-                        <p class="text-base font-semibold">Treasure Of Memories</p>
-                        <p class="mt-1 text-sm">From still to thrill, bring your photo alive.</p>
+                        <p class="text-base font-semibold">My Trading Data</p>
+                        <p class="mt-1 text-sm">From still to thrill, bring your trading alive.</p>
                     </div>
                
             </div>
-            <div
+            <!-- <div
                 class="group relative -mx-4 flex items-center self-stretch p-4 transition-colors hover:bg-gray-100 sm:self-auto sm:rounded-2xl lg:mx-0 lg:self-auto lg:p-6"
             >
                 <div
@@ -60,14 +60,14 @@
                         Scan the QR code to visit our Instagram page.
                     </p>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div
             class="flex flex-col items-center border-t border-gray-200 pt-8 pb-12  md:justify-between md:pt-6"
         >
             
             <p class="mt-6 text-sm text-gray-500 md:mt-0">
-                ©  <!-- -->2025<!-- --> Treasure of Memories. All rights reserved.
+                ©  <!-- -->2025<!-- --> My Trading Data. All rights reserved.
             </p>
         </div>
     </div>
