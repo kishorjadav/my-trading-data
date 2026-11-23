@@ -5,7 +5,14 @@
   const PAGE_SIZE = 20;
   const AUTO_REFRESH_MS = 60000; // Check for new Google Sheet rows every 60 seconds
 
+  const MONTHS = [
+    { value: "Nov_2026", label: "Nov 2026" },
+    { value: "Dec_2026", label: "Dec 2026" },
+    { value: "Jan_2027", label: "Jan 2027" }
+  ];
+
   let selectedCoin = "BTC";
+  let selectedMonth = getCurrentMonthSuffixIST();
   let selectedDate = getTodayIST(); // Defaults to today's date in IST (YYYY-MM-DD)
   let currentPage = 1;
   let allFilteredRows = [];
@@ -43,12 +50,28 @@
     return `${month}_${year}`;
   }
 
+  function getMonthSuffixFromIsoDate(dateIso) {
+    if (!dateIso || !/^\d{4}-\d{2}-\d{2}$/.test(dateIso)) {
+      return getCurrentMonthSuffixIST();
+    }
+    const [y, m, d] = dateIso.split("-").map(Number);
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "UTC",
+      month: "short",
+      year: "numeric"
+    }).formatToParts(dt);
+
+    const month = parts.find((p) => p.type === "month")?.value;
+    const year = parts.find((p) => p.type === "year")?.value;
+    return `${month}_${year}`;
+  }
+
   function formatSyncTime12Hr(dateObj = new Date()) {
     return new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Kolkata",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
       hour12: true
     }).format(dateObj);
   }
@@ -78,16 +101,14 @@
     return result;
   }
 
-  // Ignores any decimal/millisecond portion on seconds and parses into a Date
   function parseTimestampToDate(rawStr) {
     if (!rawStr) return null;
     const cleaned = String(rawStr)
       .replace(/^"|"$/g, "")
-      .replace(/\.\d+$/, "") // strip any milliseconds
+      .replace(/\.\d+$/, "")
       .trim();
     if (!cleaned) return null;
 
-    // Match YYYY-MM-DD HH:mm:ss
     const isoMatch = cleaned.match(
       /^(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?/
     );
@@ -102,7 +123,6 @@
       );
     }
 
-    // Match MM/DD/YYYY HH:mm:ss
     const usMatch = cleaned.match(
       /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/
     );
@@ -129,7 +149,6 @@
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  // Returns { dateFull: "dd-mm-yyyy", dateShort: "dd-mm-yy", timeFormatted: "hh:mm:ss AM/PM" }
   // Returns { dateFull: "dd-mm-yyyy", dateShort: "dd-mm-yy", timeFormatted: "hh:mm AM/PM" }
   function splitDateAndTime12Hr(rawStr) {
     const dt = parseTimestampToDate(rawStr);
@@ -170,9 +189,9 @@
     rows = sourceRows.slice(start, start + PAGE_SIZE);
   }
 
-  // `silent = true` refreshes in the background without flashing the loading screen
   async function fetchAndFilterData(
     coin = selectedCoin,
+    monthSuffix = selectedMonth,
     dateIso = selectedDate,
     page = currentPage,
     { silent = false } = {}
@@ -183,8 +202,7 @@
     }
 
     try {
-      const suffix = getCurrentMonthSuffixIST();
-      const tabName = `${coin}_${suffix}`;
+      const tabName = `${coin}_${monthSuffix}`;
       const tqQuery = "select A, D, E, F, G order by A desc";
       const cacheBust = Date.now();
       const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&tq=${encodeURIComponent(tqQuery)}&_t=${cacheBust}`;
@@ -248,17 +266,25 @@
   function switchCoin(coin) {
     if (selectedCoin === coin) return;
     selectedCoin = coin;
-    fetchAndFilterData(coin, selectedDate, 1);
+    fetchAndFilterData(coin, selectedMonth, selectedDate, 1);
+  }
+
+  function handleMonthChange(event) {
+    selectedMonth = event.target.value;
+    fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, 1);
   }
 
   function handleDateChange(event) {
     selectedDate = event.target.value;
-    fetchAndFilterData(selectedCoin, selectedDate, 1);
+    if (selectedDate) {
+      selectedMonth = getMonthSuffixFromIsoDate(selectedDate);
+    }
+    fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, 1);
   }
 
   function showAllDates() {
     selectedDate = "";
-    fetchAndFilterData(selectedCoin, "", 1);
+    fetchAndFilterData(selectedCoin, selectedMonth, "", 1);
   }
 
   function goToPage(pageNum) {
@@ -276,11 +302,13 @@
   }
 
   onMount(() => {
-    fetchAndFilterData(selectedCoin, selectedDate, 1);
+    fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, 1);
 
     pollTimer = setInterval(() => {
       if (document.visibilityState === "visible") {
-        fetchAndFilterData(selectedCoin, selectedDate, currentPage, { silent: true });
+        fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage, {
+          silent: true
+        });
       }
     }, AUTO_REFRESH_MS);
   });
@@ -291,7 +319,9 @@
     }
   });
 
-  $: monthSuffix = getCurrentMonthSuffixIST();
+  $: monthOptions = MONTHS.some((m) => m.value === selectedMonth)
+    ? MONTHS
+    : [{ value: selectedMonth, label: selectedMonth.replace("_", " ") }, ...MONTHS];
   $: totalPages = Math.max(1, Math.ceil(allFilteredRows.length / PAGE_SIZE));
   $: pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 </script>
@@ -302,10 +332,10 @@
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0 flex-1">
         <h1 class="truncate text-base font-semibold text-gray-900 sm:text-lg">
-          Delta Options Analytics ({selectedCoin} · {monthSuffix})
+          Delta Options Analytics ({selectedCoin} · {selectedMonth})
         </h1>
         <p class="mt-1 text-xs text-gray-600 sm:text-sm">
-          {selectedDate ? `Date: ${selectedDate}` : "All dates"} ·
+          {selectedDate ? `Date: ${selectedDate}` : "All dates in month"} ·
           Page {currentPage} of {totalPages} ({allFilteredRows.length} rows)
           {#if lastSyncedAt}
             <span class="block sm:inline">
@@ -338,20 +368,38 @@
 
         <button
           type="button"
-          on:click={() => fetchAndFilterData(selectedCoin, selectedDate, currentPage)}
-          class="w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+          on:click={() =>
+            fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage)
+          }
+          class="w-full rounded-md hidden sm:block bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
           Refresh Now
         </button>
       </div>
     </div>
 
-    <!-- Top Date Filter Bar -->
-    <div class="mt-4 flex flex-col gap-2.5 rounded-lg bg-white px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-4">
-      <label for="date-filter" class="text-sm font-medium text-gray-900">
-        Filter by Date:
-      </label>
-      <div class="flex items-center gap-2">
+    <!-- Top Month & Date Filter Bar -->
+    <div class="mt-4 flex flex-col gap-3 rounded-lg bg-white px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
+      <div class="flex items-center gap-2 hidden sm:block">
+        <label for="month-filter" class="text-sm font-medium text-gray-900">
+          Month:
+        </label>
+        <select
+          id="month-filter"
+          value={selectedMonth}
+          on:change={handleMonthChange}
+          class="rounded-md border-0 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+        >
+          {#each monthOptions as m}
+            <option value={m.value}>{m.label}</option>
+          {/each}
+        </select>
+      </div>
+
+      <div class="flex flex-1 items-center gap-2 sm:flex-initial">
+        <label for="date-filter" class="text-sm font-medium text-gray-900">
+          Date:
+        </label>
         <input
           id="date-filter"
           type="date"
@@ -384,10 +432,10 @@
           </div>
         {:else if rows.length === 0}
           <div class="px-4 py-10 text-center text-sm text-gray-500 sm:px-6">
-            No rows found{selectedDate ? ` for ${selectedDate}` : ""}.
+            No rows found{selectedDate ? ` for ${selectedDate}` : ""} in {selectedCoin}_{selectedMonth}.
           </div>
         {:else}
-          <div class="max-h-[26rem] overflow-auto sm:max-h-[32rem]">
+          <div class="max-h-[44rem] overflow-auto sm:max-h-[52rem]">
             <table class="min-w-full divide-y divide-gray-300">
               <thead class="sticky top-0 z-10 bg-gray-50 shadow-xs">
                 <tr>
