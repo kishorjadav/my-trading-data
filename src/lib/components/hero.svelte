@@ -5,6 +5,18 @@
   const PAGE_SIZE = 20;
   const AUTO_REFRESH_MS = 60000; // Check for new Google Sheet rows every 60 seconds
 
+  // Target times in minutes from midnight (IST)
+  // 5:30am (330), 6:30am (390), 10:30am (630), 2:30pm (870), 5:30pm (1050), 9:30pm (1290)
+  const TARGET_MINUTES = [
+    5 * 60 + 30,
+    6 * 60 + 30,
+    10 * 60 + 30,
+    14 * 60 + 30,
+    17 * 60 + 30,
+    21 * 60 + 30
+  ];
+  const MAX_TIME_DIFF_MINUTES = 20;
+
   const MONTHS = [
     { value: "Nov_2026", label: "Nov 2026" },
     { value: "Dec_2026", label: "Dec 2026" },
@@ -16,6 +28,7 @@
   let selectedDate = getTodayIST(); // Defaults to today's date in IST (YYYY-MM-DD)
   let currentPage = 1;
   let allFilteredRows = [];
+  let highlightedKeys = new Set();
   let rows = [];
   let loading = true;
   let error = "";
@@ -149,6 +162,11 @@
     return `${yyyy}-${mm}-${dd}`;
   }
 
+  function getMinutesFromMidnight(dt) {
+    if (!dt) return null;
+    return dt.getHours() * 60 + dt.getMinutes() + dt.getSeconds() / 60;
+  }
+
   // Returns { dateFull: "dd-mm-yyyy", dateShort: "dd-mm-yy", timeFormatted: "hh:mm AM/PM" }
   function splitDateAndTime12Hr(rawStr) {
     const dt = parseTimestampToDate(rawStr);
@@ -178,6 +196,41 @@
       dateShort: `${dd}-${mm}-${yy}`,
       timeFormatted: `${hh}:${min} ${ampm}`
     };
+  }
+
+  // Finds the single nearest row per date for each target time within MAX_TIME_DIFF_MINUTES
+  function buildHighlightedRowKeys(sourceRows) {
+    const matchedKeys = new Set();
+    const rowsByDate = new Map();
+
+    for (const item of sourceRows) {
+      if (!item.dateKey || item.minutesFromMidnight === null) continue;
+      if (!rowsByDate.has(item.dateKey)) {
+        rowsByDate.set(item.dateKey, []);
+      }
+      rowsByDate.get(item.dateKey).push(item);
+    }
+
+    for (const [, dayRows] of rowsByDate.entries()) {
+      for (const targetMin of TARGET_MINUTES) {
+        let bestRow = null;
+        let bestDiff = Infinity;
+
+        for (const item of dayRows) {
+          const diff = Math.abs(item.minutesFromMidnight - targetMin);
+          if (diff <= MAX_TIME_DIFF_MINUTES && diff < bestDiff) {
+            bestDiff = diff;
+            bestRow = item;
+          }
+        }
+
+        if (bestRow) {
+          matchedKeys.add(bestRow.rowKey);
+        }
+      }
+    }
+
+    return matchedKeys;
   }
 
   function applyPageSlice(sourceRows, page) {
@@ -224,14 +277,17 @@
           : lines;
 
       const parsedRows = dataLines
-        .map((line) => {
+        .map((line, index) => {
           const cols = parseCsvLine(line);
           const rawTs = cols[0] || "";
           const dt = parseTimestampToDate(rawTs);
           const { dateFull, dateShort, timeFormatted } = splitDateAndTime12Hr(rawTs);
+          const dateKey = toIsoDateKey(dt);
 
           return {
-            dateKey: toIsoDateKey(dt),
+            rowKey: `${dateKey}__${rawTs}__${index}`,
+            dateKey,
+            minutesFromMidnight: getMinutesFromMidnight(dt),
             dateFull,
             dateShort,
             timeFormatted,
@@ -247,6 +303,7 @@
         });
 
       allFilteredRows = parsedRows;
+      highlightedKeys = buildHighlightedRowKeys(parsedRows);
       applyPageSlice(allFilteredRows, page);
       lastSyncedAt = formatSyncTime12Hr(new Date());
       error = "";
@@ -254,6 +311,7 @@
       if (!silent) {
         error = err?.message || "Could not load sheet data.";
         allFilteredRows = [];
+        highlightedKeys = new Set();
         rows = [];
       }
     } finally {
@@ -292,12 +350,10 @@
     applyPageSlice(allFilteredRows, pageNum);
   }
 
-  function getRowHighlight(pcrStr) {
-    const pcr = parseFloat(pcrStr);
-    if (Number.isNaN(pcr)) return "";
-    if (pcr < 0.5) return "bg-rose-50";
-    if (pcr < 0.52) return "bg-amber-50";
-    if (pcr > 2) return "bg-sky-50";
+  function getRowHighlight(rowItem) {
+    if (highlightedKeys.has(rowItem.rowKey)) {
+      return "bg-amber-100/80 font-medium";
+    }
     return "";
   }
 
@@ -371,7 +427,7 @@
           on:click={() =>
             fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage)
           }
-          class="w-full rounded-md hidden sm:block bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
+          class="hidden rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:block sm:w-auto"
         >
           Refresh Now
         </button>
@@ -380,7 +436,7 @@
 
     <!-- Top Month & Date Filter Bar -->
     <div class="mt-4 flex flex-col gap-3 rounded-lg bg-white px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
-      <div class="flex items-center gap-2 hidden sm:block">
+      <div class="hidden items-center gap-2 sm:flex">
         <label for="month-filter" class="text-sm font-medium text-gray-900">
           Month:
         </label>
@@ -479,7 +535,7 @@
               </thead>
               <tbody class="divide-y divide-gray-200 bg-white">
                 {#each rows as r}
-                  <tr class={getRowHighlight(r.pcr)}>
+                  <tr class={getRowHighlight(r)}>
                     <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs font-medium text-gray-600 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
                       <span class="sm:hidden">{r.dateShort}</span>
                       <span class="hidden sm:inline">{r.dateFull}</span>
