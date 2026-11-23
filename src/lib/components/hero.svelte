@@ -1,14 +1,19 @@
 <script>
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
 
-  const SHEET_ID = "1-pezJUG27TOIn8Hx49j9_yEnw4Y6je11mfkkeTKfGc8";
+  const SHEET_ID = "1pYFPQVgCiLy6sNQAVaiHsIlsWDYfEMt__lb_nkblm_I";
+  const PAGE_SIZE = 20;
+  const AUTO_REFRESH_MS = 60000; // Check for new Google Sheet rows every 60 seconds
 
   let selectedCoin = "BTC";
-  let selectedDate = getTodayIST();
-  let btcRows = [];
-  let xautRows = [];
+  let selectedDate = getTodayIST(); // Defaults to today's date in IST (YYYY-MM-DD)
+  let currentPage = 1;
+  let allFilteredRows = [];
+  let rows = [];
   let loading = true;
   let error = "";
+  let lastSyncedAt = "";
+  let pollTimer = null;
 
   function getTodayIST() {
     const now = new Date();
@@ -19,10 +24,10 @@
       day: "2-digit"
     }).formatToParts(now);
 
-    const y = parts.find((p) => p.type === "year")?.value;
-    const m = parts.find((p) => p.type === "month")?.value;
-    const d = parts.find((p) => p.type === "day")?.value;
-    return `${y}-${m}-${d}`;
+    const year = parts.find((p) => p.type === "year")?.value;
+    const month = parts.find((p) => p.type === "month")?.value;
+    const day = parts.find((p) => p.type === "day")?.value;
+    return `${year}-${month}-${day}`;
   }
 
   function getCurrentMonthSuffixIST() {
@@ -38,170 +43,283 @@
     return `${month}_${year}`;
   }
 
-  function extractDateKey(cell) {
-    if (!cell) return "";
-    const candidates = [cell.f, cell.v].filter((x) => x !== null && x !== undefined);
+  function formatSyncTime12Hr(dateObj = new Date()) {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    }).format(dateObj);
+  }
 
-    for (const val of candidates) {
-      const str = String(val);
+  function parseCsvLine(line) {
+    const result = [];
+    let current = "";
+    let inQuotes = false;
 
-      // 1. Google gviz format: Date(year, monthIndex0to11, day, ...)
-      const gviz = str.match(/Date\((\d+),(\d+),(\d+)/);
-      if (gviz) {
-        const y = gviz[1];
-        const m = String(Number(gviz[2]) + 1).padStart(2, "0");
-        const d = String(gviz[3]).padStart(2, "0");
-        return `${y}-${m}-${d}`;
-      }
-
-      // 2. ISO format: YYYY-MM-DD
-      const iso = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-      if (iso) {
-        return `${iso[1]}-${iso[2].padStart(2, "0")}-${iso[3].padStart(2, "0")}`;
-      }
-
-      // 3. Slash format: MM/DD/YYYY or DD/MM/YYYY
-      const slash = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-      if (slash) {
-        const first = Number(slash[1]);
-        const second = Number(slash[2]);
-        const month = first > 12 ? second : first;
-        const day = first > 12 ? first : second;
-        return `${slash[3]}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === "," && !inQuotes) {
+        result.push(current.trim());
+        current = "";
+      } else {
+        current += char;
       }
     }
+    result.push(current.trim());
+    return result;
+  }
 
+  // Ignores any decimal/millisecond portion on seconds and parses into a Date
+  function parseTimestampToDate(rawStr) {
+    if (!rawStr) return null;
+    const cleaned = String(rawStr)
+      .replace(/^"|"$/g, "")
+      .replace(/\.\d+$/, "") // strip any milliseconds
+      .trim();
+    if (!cleaned) return null;
+
+    // Match YYYY-MM-DD HH:mm:ss
+    const isoMatch = cleaned.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):(\d{2})(?::(\d{2}))?/
+    );
+    if (isoMatch) {
+      return new Date(
+        Number(isoMatch[1]),
+        Number(isoMatch[2]) - 1,
+        Number(isoMatch[3]),
+        Number(isoMatch[4]),
+        Number(isoMatch[5]),
+        Number(isoMatch[6] || 0)
+      );
+    }
+
+    // Match MM/DD/YYYY HH:mm:ss
+    const usMatch = cleaned.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})(?::(\d{2}))?/
+    );
+    if (usMatch) {
+      return new Date(
+        Number(usMatch[3]),
+        Number(usMatch[1]) - 1,
+        Number(usMatch[2]),
+        Number(usMatch[4]),
+        Number(usMatch[5]),
+        Number(usMatch[6] || 0)
+      );
+    }
+
+    const fallback = new Date(cleaned);
+    return Number.isNaN(fallback.getTime()) ? null : fallback;
+  }
+
+  function toIsoDateKey(dt) {
+    if (!dt) return "";
+    const yyyy = dt.getFullYear();
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const dd = String(dt.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Returns { dateFull: "dd-mm-yyyy", dateShort: "dd-mm-yy", timeFormatted: "hh:mm:ss AM/PM" }
+  // Returns { dateFull: "dd-mm-yyyy", dateShort: "dd-mm-yy", timeFormatted: "hh:mm AM/PM" }
+  function splitDateAndTime12Hr(rawStr) {
+    const dt = parseTimestampToDate(rawStr);
+    if (!dt) {
+      return {
+        dateFull: rawStr || "",
+        dateShort: rawStr || "",
+        timeFormatted: ""
+      };
+    }
+
+    const dd = String(dt.getDate()).padStart(2, "0");
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const yyyy = String(dt.getFullYear());
+    const yy = yyyy.slice(-2);
+
+    const hours24 = dt.getHours();
+    const ampm = hours24 >= 12 ? "PM" : "AM";
+    let hours12 = hours24 % 12;
+    if (hours12 === 0) hours12 = 12;
+
+    const hh = String(hours12).padStart(2, "0");
+    const min = String(dt.getMinutes()).padStart(2, "0");
+
+    return {
+      dateFull: `${dd}-${mm}-${yyyy}`,
+      dateShort: `${dd}-${mm}-${yy}`,
+      timeFormatted: `${hh}:${min} ${ampm}`
+    };
+  }
+
+  function applyPageSlice(sourceRows, page) {
+    const totalPages = Math.max(1, Math.ceil(sourceRows.length / PAGE_SIZE));
+    const safePage = Math.min(Math.max(1, page), totalPages);
+    currentPage = safePage;
+
+    const start = (safePage - 1) * PAGE_SIZE;
+    rows = sourceRows.slice(start, start + PAGE_SIZE);
+  }
+
+  // `silent = true` refreshes in the background without flashing the loading screen
+  async function fetchAndFilterData(
+    coin = selectedCoin,
+    dateIso = selectedDate,
+    page = currentPage,
+    { silent = false } = {}
+  ) {
+    if (!silent) {
+      loading = true;
+      error = "";
+    }
+
+    try {
+      const suffix = getCurrentMonthSuffixIST();
+      const tabName = `${coin}_${suffix}`;
+      const tqQuery = "select A, D, E, F, G order by A desc";
+      const cacheBust = Date.now();
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&tq=${encodeURIComponent(tqQuery)}&_t=${cacheBust}`;
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch ${tabName} (HTTP ${res.status})`);
+      }
+
+      const csvText = await res.text();
+      const lines = csvText
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter(Boolean);
+
+      const dataLines =
+        lines.length > 0 && lines[0].toLowerCase().includes("timestamp")
+          ? lines.slice(1)
+          : lines;
+
+      const parsedRows = dataLines
+        .map((line) => {
+          const cols = parseCsvLine(line);
+          const rawTs = cols[0] || "";
+          const dt = parseTimestampToDate(rawTs);
+          const { dateFull, dateShort, timeFormatted } = splitDateAndTime12Hr(rawTs);
+
+          return {
+            dateKey: toIsoDateKey(dt),
+            dateFull,
+            dateShort,
+            timeFormatted,
+            totCallsM: cols[1] || "",
+            totPutsM: cols[2] || "",
+            pcr: cols[3] || "",
+            maxPain: cols[4] || ""
+          };
+        })
+        .filter((item) => {
+          if (!dateIso) return true;
+          return item.dateKey === dateIso;
+        });
+
+      allFilteredRows = parsedRows;
+      applyPageSlice(allFilteredRows, page);
+      lastSyncedAt = formatSyncTime12Hr(new Date());
+      error = "";
+    } catch (err) {
+      if (!silent) {
+        error = err?.message || "Could not load sheet data.";
+        allFilteredRows = [];
+        rows = [];
+      }
+    } finally {
+      if (!silent) {
+        loading = false;
+      }
+    }
+  }
+
+  function switchCoin(coin) {
+    if (selectedCoin === coin) return;
+    selectedCoin = coin;
+    fetchAndFilterData(coin, selectedDate, 1);
+  }
+
+  function handleDateChange(event) {
+    selectedDate = event.target.value;
+    fetchAndFilterData(selectedCoin, selectedDate, 1);
+  }
+
+  function showAllDates() {
+    selectedDate = "";
+    fetchAndFilterData(selectedCoin, "", 1);
+  }
+
+  function goToPage(pageNum) {
+    if (loading || pageNum < 1 || pageNum > totalPages) return;
+    applyPageSlice(allFilteredRows, pageNum);
+  }
+
+  function getRowHighlight(pcrStr) {
+    const pcr = parseFloat(pcrStr);
+    if (Number.isNaN(pcr)) return "";
+    if (pcr < 0.5) return "bg-rose-50";
+    if (pcr < 0.52) return "bg-amber-50";
+    if (pcr > 2) return "bg-sky-50";
     return "";
   }
 
-  async function fetchTabRows(tabName) {
-    try {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tabName)}`;
-      const res = await fetch(url);
-      if (!res.ok) {
-        console.warn(`Could not fetch ${tabName}: HTTP ${res.status}`);
-        return [];
-      }
-
-      const text = await res.text();
-      const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);?\s*$/);
-      if (!match) {
-        console.warn(`Unexpected response format for ${tabName}.`);
-        return [];
-      }
-
-      const parsed = JSON.parse(match[1]);
-      if (parsed.status === "error") {
-        console.warn(`Google Sheets query error for ${tabName}:`, parsed.errors);
-        return [];
-      }
-
-      const rows = parsed?.table?.rows || [];
-      return rows
-        .map((row) => {
-          const c = row.c || [];
-          const displayTs = c[0]?.f || String(c[0]?.v ?? "");
-          return {
-            timestamp: displayTs,
-            dateKey: extractDateKey(c[0]),
-            expiry: c[1]?.f || String(c[1]?.v ?? ""),
-            spot: c[2]?.v ?? null,
-            totCallsM: c[3]?.v ?? null,
-            totPutsM: c[4]?.v ?? null,
-            pcr: c[5]?.v ?? null,
-            maxPain: c[6]?.v ?? null
-          };
-        })
-        .filter((r) => r.timestamp);
-    } catch (err) {
-      console.warn(`Error loading ${tabName}:`, err);
-      return [];
-    }
-  }
-
-  async function loadAllData() {
-    loading = true;
-    error = "";
-    try {
-      const suffix = getCurrentMonthSuffixIST();
-      const [btc, xaut] = await Promise.all([
-        fetchTabRows(`BTC_${suffix}`),
-        fetchTabRows(`XAUT_${suffix}`)
-      ]);
-      btcRows = btc;
-      xautRows = xaut;
-    } catch (err) {
-      error = err?.message || "Could not load Google Sheet data.";
-    } finally {
-      loading = false;
-    }
-  }
-
-  // Matches the first-occurrence PCR threshold highlights from your Apps Script
-  function computeHighlightedRows(rows) {
-    let highlightedBelow052 = false;
-    let highlightedBelow050 = false;
-    let highlightedAbove2 = false;
-    let highlightedBelow2 = false;
-
-    return rows.map((row) => {
-      const pcr = Number(row.pcr);
-      let rowBg = "";
-
-      if (!Number.isNaN(pcr)) {
-        if (pcr >= 0.52) highlightedBelow052 = false;
-        if (pcr >= 0.50) highlightedBelow050 = false;
-        if (pcr <= 2) highlightedAbove2 = false;
-        if (pcr >= 2) highlightedBelow2 = false;
-
-        if (pcr > 0.50 && pcr < 0.52 && !highlightedBelow052) {
-          rowBg = "bg-amber-100";
-          highlightedBelow052 = true;
-        } else if (pcr < 0.50 && !highlightedBelow050) {
-          rowBg = "bg-rose-100";
-          highlightedBelow050 = true;
-        } else if (pcr > 2 && !highlightedAbove2) {
-          rowBg = "bg-sky-100";
-          highlightedAbove2 = true;
-        } else if (pcr < 2 && !highlightedBelow2) {
-          rowBg = "bg-emerald-100";
-          highlightedBelow2 = true;
-        }
-      }
-
-      return { ...row, rowBg };
-    });
-  }
-
   onMount(() => {
-    loadAllData();
+    fetchAndFilterData(selectedCoin, selectedDate, 1);
+
+    pollTimer = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchAndFilterData(selectedCoin, selectedDate, currentPage, { silent: true });
+      }
+    }, AUTO_REFRESH_MS);
+  });
+
+  onDestroy(() => {
+    if (pollTimer) {
+      clearInterval(pollTimer);
+    }
   });
 
   $: monthSuffix = getCurrentMonthSuffixIST();
-  $: activeRows = selectedCoin === "BTC" ? btcRows : xautRows;
-  $: filteredRows = selectedDate
-    ? activeRows.filter((r) => r.dateKey === selectedDate)
-    : activeRows;
-  $: displayedRows = computeHighlightedRows(filteredRows);
+  $: totalPages = Math.max(1, Math.ceil(allFilteredRows.length / PAGE_SIZE));
+  $: pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 </script>
 
-<main class="py-6">
-  <div class="px-4 sm:px-6 lg:px-8">
-    <div class="sm:flex sm:items-center">
-      <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">
+<main class="min-h-screen bg-gray-50/50 py-4 sm:py-6">
+  <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+    <!-- Top Header & Coin/Action Controls -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="min-w-0 flex-1">
+        <h1 class="truncate text-base font-semibold text-gray-900 sm:text-lg">
           Delta Options Analytics ({selectedCoin} · {monthSuffix})
         </h1>
-        <p class="mt-2 text-sm text-gray-700">
-          Live options open interest, PCR, and Max Pain logged every 30 minutes from Delta Exchange.
+        <p class="mt-1 text-xs text-gray-600 sm:text-sm">
+          {selectedDate ? `Date: ${selectedDate}` : "All dates"} ·
+          Page {currentPage} of {totalPages} ({allFilteredRows.length} rows)
+          {#if lastSyncedAt}
+            <span class="block sm:inline">
+              <span class="hidden sm:inline">·</span> Synced {lastSyncedAt} (auto 60s)
+            </span>
+          {/if}
         </p>
       </div>
 
-      <div class="mt-4 flex flex-wrap items-center gap-2 sm:ml-16 sm:mt-0 sm:flex-none">
+      <div class="flex flex-wrap items-center gap-2 sm:flex-none">
         <button
           type="button"
-          on:click={() => (selectedCoin = "BTC")}
-          class="rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm {selectedCoin === 'BTC'
+          on:click={() => switchCoin("BTC")}
+          class="flex-1 rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm sm:flex-none {selectedCoin === 'BTC'
             ? 'bg-indigo-600 text-white hover:bg-indigo-500'
             : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
         >
@@ -210,134 +328,127 @@
 
         <button
           type="button"
-          on:click={() => (selectedCoin = "XAUT")}
-          class="rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm {selectedCoin === 'XAUT'
+          on:click={() => switchCoin("XAUT")}
+          class="flex-1 rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm sm:flex-none {selectedCoin === 'XAUT'
             ? 'bg-indigo-600 text-white hover:bg-indigo-500'
             : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
         >
           XAUT
         </button>
 
-        <input
-          type="date"
-          bind:value={selectedDate}
-          aria-label="Filter by IST date"
-          class="rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 ring-1 ring-inset ring-gray-300 focus:outline-2 focus:outline-offset-2 focus:outline-indigo-600"
-        />
-
         <button
           type="button"
-          on:click={() => (selectedDate = "")}
-          class="rounded-md bg-white px-3 py-2 text-center text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+          on:click={() => fetchAndFilterData(selectedCoin, selectedDate, currentPage)}
+          class="w-full rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:w-auto"
         >
-          Show All
-        </button>
-
-        <button
-          type="button"
-          on:click={loadAllData}
-          class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          Refresh
+          Refresh Now
         </button>
       </div>
     </div>
 
-    {#if loading}
-      <p class="mt-6 text-sm text-gray-500">Loading options data...</p>
-    {:else if error}
-      <p class="mt-6 text-sm text-red-600">{error}</p>
-    {:else if displayedRows.length === 0}
-      <p class="mt-6 text-sm text-gray-500">
-        No rows found for {selectedCoin} on {selectedDate || "selected filter"}.
-      </p>
-    {:else}
-      <div class="mt-8 flow-root">
-        <div class="-mx-4 -my-2 sm:-mx-6 lg:-mx-8">
-          <div class="inline-block min-w-full py-2 align-middle">
-            <table class="min-w-full border-separate border-spacing-0">
-              <thead>
+    <!-- Top Date Filter Bar -->
+    <div class="mt-4 flex flex-col gap-2.5 rounded-lg bg-white px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:px-4">
+      <label for="date-filter" class="text-sm font-medium text-gray-900">
+        Filter by Date:
+      </label>
+      <div class="flex items-center gap-2">
+        <input
+          id="date-filter"
+          type="date"
+          value={selectedDate}
+          on:change={handleDateChange}
+          class="w-full rounded-md border-0 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:w-auto"
+        />
+        {#if selectedDate}
+          <button
+            type="button"
+            on:click={showAllDates}
+            class="shrink-0 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100"
+          >
+            All Dates
+          </button>
+        {/if}
+      </div>
+    </div>
+
+    <!-- Scrollable Table Container with Sticky Header -->
+    <div class="mt-4 flow-root sm:mt-6">
+      <div class="overflow-hidden bg-white shadow outline outline-1 outline-black/5 sm:rounded-lg">
+        {#if loading}
+          <div class="px-4 py-10 text-center text-sm text-gray-500 sm:px-6">
+            Loading page {currentPage}...
+          </div>
+        {:else if error}
+          <div class="px-4 py-10 text-center text-sm text-red-600 sm:px-6">
+            {error}
+          </div>
+        {:else if rows.length === 0}
+          <div class="px-4 py-10 text-center text-sm text-gray-500 sm:px-6">
+            No rows found{selectedDate ? ` for ${selectedDate}` : ""}.
+          </div>
+        {:else}
+          <div class="max-h-[26rem] overflow-auto sm:max-h-[32rem]">
+            <table class="min-w-full divide-y divide-gray-300">
+              <thead class="sticky top-0 z-10 bg-gray-50 shadow-xs">
                 <tr>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 border-b border-gray-300 bg-white/75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                    class="py-3 pl-3 pr-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-6 sm:pr-3 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
-                    Timestamp (IST)
+                    Date
                   </th>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 hidden border-b border-gray-300 bg-white/75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
+                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
-                    Expiry
+                    Time (IST)
                   </th>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 border-b border-gray-300 bg-white/75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
-                  >
-                    Spot
-                  </th>
-                  <th
-                    scope="col"
-                    class="sticky top-0 z-10 hidden border-b border-gray-300 bg-white/75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell"
+                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
                     Tot. Calls ($M)
                   </th>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 hidden border-b border-gray-300 bg-white/75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell"
+                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
                     Tot. Puts ($M)
                   </th>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 border-b border-gray-300 bg-white/75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
+                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
                     PCR
                   </th>
                   <th
                     scope="col"
-                    class="sticky top-0 z-10 border-b border-gray-300 bg-white/75 py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pr-6 lg:pr-8"
+                    class="py-3 pl-2 pr-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-3 sm:pr-6 sm:text-sm sm:normal-case sm:tracking-normal"
                   >
                     Max Pain
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {#each displayedRows as r, idx}
-                  <tr class={r.rowBg}>
-                    <td
-                      class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8 {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
-                      {r.timestamp}
+              <tbody class="divide-y divide-gray-200 bg-white">
+                {#each rows as r}
+                  <tr class={getRowHighlight(r.pcr)}>
+                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs font-medium text-gray-900 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
+                      <span class="sm:hidden">{r.dateShort}</span>
+                      <span class="hidden sm:inline">{r.dateFull}</span>
                     </td>
-                    <td
-                      class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 sm:table-cell {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
-                      {r.expiry}
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-700 sm:px-3 sm:py-4 sm:text-sm">
+                      {r.timeFormatted}
                     </td>
-                    <td
-                      class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
-                      {r.spot}
-                    </td>
-                    <td
-                      class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
                       {r.totCallsM}
                     </td>
-                    <td
-                      class="hidden whitespace-nowrap px-3 py-4 text-sm text-gray-500 lg:table-cell {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
                       {r.totPutsM}
                     </td>
-                    <td
-                      class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
                       {r.pcr}
                     </td>
-                    <td
-                      class="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium text-gray-900 sm:pr-6 lg:pr-8 {idx !== displayedRows.length - 1 ? 'border-b border-gray-200' : ''}"
-                    >
+                    <td class="whitespace-nowrap py-3 pl-2 pr-3 text-right text-xs font-medium text-gray-900 sm:py-4 sm:pl-3 sm:pr-6 sm:text-sm">
                       {r.maxPain}
                     </td>
                   </tr>
@@ -345,8 +456,49 @@
               </tbody>
             </table>
           </div>
+        {/if}
+
+        <!-- Pagination Footer with 1, 2, 3... buttons -->
+        <div class="flex flex-col gap-3 border-t border-gray-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+          <div class="text-center text-xs text-gray-700 sm:text-left sm:text-sm">
+            Showing <span class="font-medium">{rows.length}</span> of
+            <span class="font-medium">{allFilteredRows.length}</span> rows
+          </div>
+
+          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:justify-end">
+            <button
+              type="button"
+              on:click={() => goToPage(currentPage - 1)}
+              disabled={currentPage <= 1 || loading}
+              class="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-sm"
+            >
+              Previous
+            </button>
+
+            {#each pageNumbers as num}
+              <button
+                type="button"
+                on:click={() => goToPage(num)}
+                disabled={loading}
+                class="rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-sm sm:px-3 sm:text-sm {num === currentPage
+                  ? 'bg-indigo-600 text-white hover:bg-indigo-500'
+                  : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
+              >
+                {num}
+              </button>
+            {/each}
+
+            <button
+              type="button"
+              on:click={() => goToPage(currentPage + 1)}
+              disabled={currentPage >= totalPages || loading}
+              class="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-sm"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
-    {/if}
+    </div>
   </div>
 </main>
