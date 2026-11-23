@@ -12,15 +12,15 @@
 
 
 <main>
-  <section>
+  <!-- <section>
    
     <Header/>
-  </section>
+  </section> -->
   <div>
    {@render children()}
   </div>
-  <section>
+  <!-- <section>
    
     <Footer/>
-  </section>
+  </section> -->
 </main>

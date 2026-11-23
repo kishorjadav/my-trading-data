@@ -432,23 +432,23 @@
               <tbody class="divide-y divide-gray-200 bg-white">
                 {#each rows as r}
                   <tr class={getRowHighlight(r.pcr)}>
-                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs font-medium text-gray-900 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
+                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs font-medium text-gray-600 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
                       <span class="sm:hidden">{r.dateShort}</span>
                       <span class="hidden sm:inline">{r.dateFull}</span>
                     </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-700 sm:px-3 sm:py-4 sm:text-sm">
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
                       {r.timeFormatted}
                     </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
                       {r.totCallsM}
                     </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
                       {r.totPutsM}
                     </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-500 sm:px-3 sm:py-4 sm:text-sm">
+                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
                       {r.pcr}
                     </td>
-                    <td class="whitespace-nowrap py-3 pl-2 pr-3 text-right text-xs font-medium text-gray-900 sm:py-4 sm:pl-3 sm:pr-6 sm:text-sm">
+                    <td class="whitespace-nowrap py-3 pl-2 pr-3 text-right text-xs font-medium text-gray-600 sm:py-4 sm:pl-3 sm:pr-6 sm:text-sm">
                       {r.maxPain}
                     </td>
                   </tr>
