@@ -52,7 +52,7 @@
  
 </section>
 <section>
-   <XauKeyLiquidationLevels/>
+   <!-- <XauKeyLiquidationLevels/> -->
 </section>
 <section>
    <News/>
