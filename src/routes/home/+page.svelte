@@ -1,6 +1,7 @@
 <script lang="ts">
   import { page } from "$app/stores";
   import Hero from "$lib/components/hero.svelte";
+  import News from "$lib/components/news.svelte";
    import { onMount } from "svelte";
   $: path = $page.url.pathname;
   $: size = $page.url.pathname.split("/")[1];
@@ -47,6 +48,10 @@
 
 <section>
   <Hero/>
+ 
+</section>
+<section>
+   <News/>
 </section>
 
 

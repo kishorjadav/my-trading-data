@@ -414,13 +414,13 @@
   $: pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 </script>
 
-<main class="min-h-screen bg-gray-50/50 py-4 sm:py-6">
+<main class=" bg-gray-50/50 py-4 sm:py-6">
   <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
     <!-- Top Header & Coin/Action Controls -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0 flex-1">
         <h1 class="truncate text-base font-semibold text-gray-900 sm:text-lg">
-          Delta Options Analytics ({selectedCoin} · {selectedMonth})
+          My Data Analytics ({selectedCoin} · {selectedMonth})
         </h1>
         <p class="mt-1 text-xs text-gray-600 sm:text-sm">
           {selectedDate ? `Date: ${selectedDate}` : "All dates in month"} ·
