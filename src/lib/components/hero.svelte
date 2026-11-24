@@ -199,34 +199,67 @@
   }
 
   // Evaluates PCR and returns Trend label + badge classes
+  // function getTrendInfo(pcrStr) {
+  //   const pcr = parseFloat(pcrStr);
+  //   if (Number.isNaN(pcr)) {
+  //     return { label: "-", badgeClass: "text-gray-400" };
+  //   }
+  //   if (pcr >= 1.98 || pcr >= 2) {
+  //     return {
+  //       label: "Buy",
+  //       badgeClass: "inline-flex items-center rounded-md bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
+  //     };
+  //   }    
+  //   if (pcr <= 0.50 || pcr <=0.52 ) {
+  //     return {
+  //       label: "Sell",
+  //       badgeClass: "inline-flex items-center rounded-md bg-pink-100 px-2 py-1 text-xs font-medium text-pink-700"
+  //     };
+  //   }
+  //   if (pcr < 1.97 && pcr > 0.53) {
+  //     return {
+  //       label: "Neutral",
+  //       badgeClass: "inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800"
+  //     };
+  //   }
+  //   return {
+  //     label: "-",
+  //     badgeClass: "inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-zinc-100"
+  //   };
+  // }
+
   function getTrendInfo(pcrStr) {
-    const pcr = parseFloat(pcrStr);
-    if (Number.isNaN(pcr)) {
-      return { label: "-", badgeClass: "text-gray-400" };
-    }
-    if (pcr >= 1.98 || pcr >= 2) {
-      return {
-        label: "Buy",
-        badgeClass: "inline-flex items-center rounded-md bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700"
-      };
-    }    
-    if (pcr <= 0.50 || pcr <=0.52 ) {
-      return {
-        label: "Sell",
-        badgeClass: "inline-flex items-center rounded-md bg-pink-100 px-2 py-1 text-xs font-medium text-pink-700"
-      };
-    }
-    if (pcr < 1.97 && pcr > 0.53) {
-      return {
-        label: "Neutral",
-        badgeClass: "inline-flex items-center rounded-md bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800"
-      };
-    }
+  const pcr = parseFloat(pcrStr);
+  if (Number.isNaN(pcr)) {
+    return { label: "-", badgeClass: "text-zinc-400" };
+  }
+  if (pcr >= 1.98 || pcr >= 2) {
     return {
-      label: "-",
-      badgeClass: "inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600"
+      label: "Buy",
+      badgeClass:
+        "inline-flex items-center rounded-md border border-purple-400/35 bg-purple-500/15 px-2 py-1 text-xs font-medium text-purple-300"
     };
   }
+  if (pcr <= 0.50 || pcr <= 0.52) {
+    return {
+      label: "Sell",
+      badgeClass:
+        "inline-flex items-center rounded-md border border-pink-400/35 bg-pink-500/15 px-2 py-1 text-xs font-medium text-pink-300"
+    };
+  }
+  if (pcr < 1.97 && pcr > 0.53) {
+    return {
+      label: "Neutral",
+      badgeClass:
+        "inline-flex items-center rounded-md border border-amber-400/35 bg-amber-500/15 px-2 py-1 text-xs font-medium text-amber-300"
+    };
+  }
+  return {
+    label: "-",
+    badgeClass:
+      "inline-flex items-center rounded-md border border-zinc-600/50 bg-zinc-900/80 px-2 py-1 text-xs font-medium text-zinc-300"
+  };
+}
 
   // Finds the single nearest row per date for each target time within MAX_TIME_DIFF_MINUTES
   function buildHighlightedRowKeys(sourceRows) {
@@ -384,7 +417,7 @@
 
   function getRowHighlight(rowItem) {
     if (highlightedKeys.has(rowItem.rowKey)) {
-      return "bg-amber-100/80 font-medium";
+      return "bg-amber-500/15 hover:bg-amber-500/20";
     }
     return "";
   }
@@ -414,15 +447,15 @@
   $: pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 </script>
 
-<main class=" bg-gray-50/50 py-4 sm:py-6">
+<main class=" bg-[#27272a] py-4 sm:py-6">
   <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
     <!-- Top Header & Coin/Action Controls -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div class="min-w-0 flex-1">
-        <h1 class="truncate text-base font-semibold text-gray-900 sm:text-lg">
+        <h1 class="truncate text-base font-semibold text-white sm:text-lg">
           My Data Analytics ({selectedCoin} · {selectedMonth})
         </h1>
-        <p class="mt-1 text-xs text-gray-600 sm:text-sm">
+        <p class="mt-1 text-xs text-zinc-100 sm:text-sm">
           {selectedDate ? `Date: ${selectedDate}` : "All dates in month"} ·
           Page {currentPage} of {totalPages} ({allFilteredRows.length} rows)
           {#if lastSyncedAt}
@@ -434,49 +467,49 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-2 sm:flex-none">
-        <button
-          type="button"
-          on:click={() => switchCoin("BTC")}
-          class="flex-1 rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm sm:flex-none {selectedCoin === 'BTC'
-            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-            : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
-        >
-          BTC
-        </button>
+  <button
+    type="button"
+    on:click={() => switchCoin("BTC")}
+    class="flex-1 cursor-pointer rounded-md border px-3 py-2 text-center text-sm font-semibold shadow-sm transition sm:flex-none {selectedCoin === 'BTC'
+      ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 hover:bg-indigo-500/30 hover:text-white'
+      : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white'}"
+  >
+    BTC
+  </button>
 
-        <button
-          type="button"
-          on:click={() => switchCoin("XAUT")}
-          class="flex-1 rounded-md px-3 py-2 text-center text-sm font-semibold shadow-sm sm:flex-none {selectedCoin === 'XAUT'
-            ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-            : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
-        >
-          XAUT
-        </button>
+  <button
+    type="button"
+    on:click={() => switchCoin("XAUT")}
+    class="flex-1 cursor-pointer rounded-md border px-3 py-2 text-center text-sm font-semibold shadow-sm transition sm:flex-none {selectedCoin === 'XAUT'
+      ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 hover:bg-indigo-500/30 hover:text-white'
+      : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white'}"
+  >
+    XAUT
+  </button>
 
-        <button
-          type="button"
-          on:click={() =>
-            fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage)
-          }
-          class="hidden rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 sm:block sm:w-auto"
-        >
-          Refresh Now
-        </button>
-      </div>
+  <button
+    type="button"
+    on:click={() =>
+      fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage)
+    }
+    class="hidden cursor-pointer rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 sm:block sm:w-auto"
+  >
+    Refresh Now
+  </button>
+</div>
     </div>
 
     <!-- Top Month & Date Filter Bar -->
-    <div class="mt-4 flex flex-col gap-3 rounded-lg bg-white px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
+    <div class="mt-4 flex flex-col gap-3 rounded-lg bg-[#27272a] px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
       <div class="hidden items-center gap-2 sm:flex">
-        <label for="month-filter" class="text-sm font-medium text-gray-900">
+        <label for="month-filter" class="text-sm font-medium  text-zinc-100">
           Month:
         </label>
         <select
           id="month-filter"
           value={selectedMonth}
           on:change={handleMonthChange}
-          class="rounded-md border-0 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+          class="rounded-md  border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-100 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
         >
           {#each monthOptions as m}
             <option value={m.value}>{m.label}</option>
@@ -484,156 +517,158 @@
         </select>
       </div>
 
-      <div class="flex flex-1 items-center gap-2 sm:flex-initial">
-        <label for="date-filter" class="text-sm font-medium text-gray-900">
-          Date:
-        </label>
-        <input
-          id="date-filter"
-          type="date"
-          value={selectedDate}
-          on:change={handleDateChange}
-          class="w-full rounded-md border-0 bg-white px-3 py-1.5 text-sm text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:w-auto"
-        />
-        {#if selectedDate}
-          <button
-            type="button"
-            on:click={showAllDates}
-            class="shrink-0 rounded-md bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100"
-          >
-            All Dates
-          </button>
-        {/if}
-      </div>
+     <div class="flex flex-1 items-center gap-2 sm:flex-initial">
+  <label for="date-filter" class="text-sm font-medium text-zinc-100">
+    Date:
+  </label>
+  <input
+    id="date-filter"
+    type="date"
+    value={selectedDate}
+    on:change={handleDateChange}
+    class="w-full cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-100 shadow-sm transition [color-scheme:dark] focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 focus:outline-none sm:w-auto"
+  />
+  <!-- {#if selectedDate}
+    <button
+      type="button"
+      on:click={showAllDates}
+      class="shrink-0 cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm font-semibold text-zinc-300 shadow-sm transition hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white"
+    >
+      All Dates
+    </button>
+  {/if} -->
+</div>
     </div>
 
     <!-- Scrollable Table Container with Sticky Header -->
     <div class="mt-4 flow-root sm:mt-6">
-      <div class="overflow-hidden bg-white shadow outline outline-1 outline-black/5 sm:rounded-lg">
-        {#if loading}
-          <div class="px-4 py-10 text-center text-sm text-gray-500 sm:px-6">
-            Loading page {currentPage}...
-          </div>
-        {:else if error}
-          <div class="px-4 py-10 text-center text-sm text-red-600 sm:px-6">
-            {error}
-          </div>
-        {:else if rows.length === 0}
-          <div class="px-4 py-10 text-center text-sm text-gray-500 sm:px-6">
-            No rows found{selectedDate ? ` for ${selectedDate}` : ""} in {selectedCoin}_{selectedMonth}.
-          </div>
-        {:else}
-          <div class="max-h-[44rem] overflow-auto sm:max-h-[52rem]">
-            <table class="min-w-full divide-y divide-gray-300">
-              <thead class="sticky top-0 z-10 bg-gray-50 shadow-xs">
-                <tr>
-                  <th
-                    scope="col"
-                    class="py-3 pl-3 pr-2 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-6 sm:pr-3 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    Time (IST)
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    Tot. Calls ($M)
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    Tot. Puts ($M)
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-2 py-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    PCR
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-2 py-3 text-center text-xs font-semibold uppercase tracking-wide text-gray-900 sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    Trend
-                  </th>
-                  <th
-                    scope="col"
-                    class="py-3 pl-2 pr-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-900 sm:py-3.5 sm:pl-3 sm:pr-6 sm:text-sm sm:normal-case sm:tracking-normal"
-                  >
-                    Max Pain
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-200 bg-white">
-                {#each rows as r}
-                  <tr class={getRowHighlight(r)}>
-                    <td class="whitespace-nowrap py-3 pl-3 pr-2 text-xs text-gray-600 sm:py-4 sm:pl-6 sm:pr-3 sm:text-sm">
-                      {r.timeFormatted}
-                    </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
-                      {r.totCallsM}
-                    </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
-                      {r.totPutsM}
-                    </td>
-                    <td class="whitespace-nowrap px-2 py-3 text-xs text-gray-600 sm:px-3 sm:py-4 sm:text-sm">
-                      {r.pcr}
-                    </td>
-                    <td class="whitespace-nowrap text-center px-2 py-3 text-xs sm:px-3 sm:py-4 sm:text-sm">
-                      <span class={r.trend.badgeClass}>{r.trend.label}</span>
-                    </td>
-                    <td class="whitespace-nowrap py-3 pl-2 pr-3 text-right text-xs font-medium text-gray-600 sm:py-4 sm:pl-3 sm:pr-6 sm:text-sm">
-                      {r.maxPain}
-                    </td>
-                  </tr>
-                {/each}
-              </tbody>
-            </table>
-          </div>
-        {/if}
-
-        <!-- Pagination Footer with 1, 2, 3... buttons -->
-        <div class="flex flex-col gap-3 border-t border-gray-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <div class="text-center text-xs text-gray-700 sm:text-left sm:text-sm">
-            Showing <span class="font-medium">{rows.length}</span> of
-            <span class="font-medium">{allFilteredRows.length}</span> rows
-          </div>
-
-          <div class="flex flex-wrap items-center justify-center gap-1.5 sm:justify-end">
-            <button
-              type="button"
-              on:click={() => goToPage(currentPage - 1)}
-              disabled={currentPage <= 1 || loading}
-              class="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-sm"
-            >
-              Previous
-            </button>
-
-            {#each pageNumbers as num}
-              <button
-                type="button"
-                on:click={() => goToPage(num)}
-                disabled={loading}
-                class="rounded-md px-2.5 py-1.5 text-xs font-semibold shadow-sm sm:px-3 sm:text-sm {num === currentPage
-                  ? 'bg-indigo-600 text-white hover:bg-indigo-500'
-                  : 'bg-white text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50'}"
+  <div class="overflow-hidden rounded-lg border border-zinc-700 bg-[#27272a] shadow-md">
+    {#if loading}
+      <div class="px-4 py-10 text-center text-sm text-zinc-300 sm:px-6">
+        Loading page {currentPage}...
+      </div>
+    {:else if error}
+      <div class="px-4 py-10 text-center text-sm font-medium text-red-300 sm:px-6">
+        {error}
+      </div>
+    {:else if rows.length === 0}
+      <div class="px-4 py-10 text-center text-sm text-zinc-300 sm:px-6">
+        No rows found{selectedDate ? ` for ${selectedDate}` : ""} in {selectedCoin}_{selectedMonth}.
+      </div>
+    {:else}
+      <div class="max-h-[44rem] overflow-auto sm:max-h-[52rem]">
+        <table class="min-w-full divide-y divide-zinc-700 bg-[#27272a]">
+          <thead class="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-xs">
+            <tr class="divide-x divide-zinc-700/80">
+              <th
+                scope="col"
+                class="py-3 pr-2 pl-3 text-left text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:py-3.5 sm:pr-3 sm:pl-6 sm:text-sm sm:normal-case sm:tracking-normal"
               >
-                {num}
-              </button>
-            {/each}
+                Time (IST)
+              </th>
+              <th
+                scope="col"
+                class="px-2 py-3 text-left text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
+              >
+                Tot. Calls ($M)
+              </th>
+              <th
+                scope="col"
+                class="px-2 py-3 text-left text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
+              >
+                Tot. Puts ($M)
+              </th>
+              <th
+                scope="col"
+                class="px-2 py-3 text-left text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
+              >
+                PCR
+              </th>
+              <th
+                scope="col"
+                class="px-2 py-3 text-center text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:px-3 sm:py-3.5 sm:text-sm sm:normal-case sm:tracking-normal"
+              >
+                Trend
+              </th>
+              <th
+                scope="col"
+                class="py-3 pr-3 pl-2 text-right text-xs font-semibold tracking-wider text-zinc-200 uppercase sm:py-3.5 sm:pr-6 sm:pl-3 sm:text-sm sm:normal-case sm:tracking-normal"
+              >
+                Max Pain
+              </th>
+            </tr>
+          </thead>
 
-            <button
-              type="button"
-              on:click={() => goToPage(currentPage + 1)}
-              disabled={currentPage >= totalPages || loading}
-              class="rounded-md bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:px-3 sm:text-sm"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+          <tbody class="divide-y divide-zinc-700/80 bg-[#27272a]">
+            {#each rows as r}
+              <tr class="divide-x divide-zinc-700/60 transition hover:bg-zinc-900/50 {getRowHighlight(r)}">
+                <td class="py-3 pr-2 pl-3 text-xs font-medium whitespace-nowrap text-zinc-200 tabular-nums sm:py-4 sm:pr-3 sm:pl-6 sm:text-sm">
+                  {r.timeFormatted}
+                </td>
+                <td class="px-2 py-3 text-xs whitespace-nowrap text-zinc-100 tabular-nums sm:px-3 sm:py-4 sm:text-sm">
+                  {r.totCallsM}
+                </td>
+                <td class="px-2 py-3 text-xs whitespace-nowrap text-zinc-100 tabular-nums sm:px-3 sm:py-4 sm:text-sm">
+                  {r.totPutsM}
+                </td>
+                <td class="px-2 py-3 text-xs font-medium whitespace-nowrap text-indigo-300 tabular-nums sm:px-3 sm:py-4 sm:text-sm">
+                  {r.pcr}
+                </td>
+                <td class="px-2 py-3 text-center text-xs whitespace-nowrap sm:px-3 sm:py-4 sm:text-sm">
+                  <span class={r.trend.badgeClass}>{r.trend.label}</span>
+                </td>
+                <td class="py-3 pr-3 pl-2 text-right text-xs font-semibold whitespace-nowrap text-white tabular-nums sm:py-4 sm:pr-6 sm:pl-3 sm:text-sm">
+                  {r.maxPain}
+                </td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    {/if}
+
+    <!-- Pagination Footer with 1, 2, 3... buttons -->
+    <div class="flex flex-col gap-3 border-t border-zinc-700 bg-[#27272a] px-3 py-3 text-zinc-100 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <div class="text-center text-xs text-zinc-400 tabular-nums sm:text-left sm:text-sm">
+        Showing <span class="font-semibold text-zinc-200">{rows.length}</span> of
+        <span class="font-semibold text-zinc-200">{allFilteredRows.length}</span> rows
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-1.5 sm:justify-end">
+        <button
+          type="button"
+          on:click={() => goToPage(currentPage - 1)}
+          disabled={currentPage <= 1 || loading}
+          class="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-xs font-semibold text-zinc-300 shadow-sm transition hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-800 disabled:bg-zinc-900/40 disabled:text-zinc-500 disabled:opacity-60 sm:px-3 sm:text-sm"
+        >
+          Previous
+        </button>
+
+        {#each pageNumbers as num}
+          <button
+            type="button"
+            on:click={() => goToPage(num)}
+            disabled={loading}
+            aria-current={num === currentPage ? "page" : undefined}
+            class="cursor-pointer rounded-md border px-2.5 py-1.5 text-xs font-semibold tabular-nums shadow-sm transition disabled:cursor-not-allowed disabled:opacity-60 sm:px-3 sm:text-sm {num === currentPage
+              ? 'border-indigo-400 bg-indigo-500/20 text-indigo-200 hover:bg-indigo-500/30 hover:text-white'
+              : 'border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white'}"
+          >
+            {num}
+          </button>
+        {/each}
+
+        <button
+          type="button"
+          on:click={() => goToPage(currentPage + 1)}
+          disabled={currentPage >= totalPages || loading}
+          class="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-2.5 py-1.5 text-xs font-semibold text-zinc-300 shadow-sm transition hover:border-zinc-600 hover:bg-[#2f2f34] hover:text-white disabled:cursor-not-allowed disabled:border-zinc-800 disabled:bg-zinc-900/40 disabled:text-zinc-500 disabled:opacity-60 sm:px-3 sm:text-sm"
+        >
+          Next
+        </button>
       </div>
     </div>
+  </div>
+</div>
   </div>
 </main>
