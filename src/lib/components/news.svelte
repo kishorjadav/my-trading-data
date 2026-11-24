@@ -202,7 +202,7 @@
         <div class="sm:flex-auto">
           <div class="flex flex-wrap items-center gap-2.5">
             <h1 class="text-base font-semibold text-white sm:text-lg">
-              Forex Factory Calendar
+              My News Calendar
             </h1>
             {#if lastUpdated}
               <span class="rounded-full border border-zinc-600 bg-zinc-900/70 px-2.5 py-0.5 text-xs font-medium text-zinc-300">
@@ -241,7 +241,7 @@
             />
           </label>
 
-          {#if selectedDate !== "ALL"}
+          <!-- {#if selectedDate !== "ALL"}
             <button
               type="button"
               on:click={() => (selectedDate = "ALL")}
@@ -249,7 +249,7 @@
             >
               All Dates
             </button>
-          {/if}
+          {/if} -->
         </div>
 
         <div class="flex min-w-0 flex-1 gap-1.5 overflow-x-auto pb-1 sm:pb-0">
