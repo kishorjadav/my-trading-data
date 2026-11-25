@@ -4,6 +4,7 @@
   const SHEET_ID = "1pYFPQVgCiLy6sNQAVaiHsIlsWDYfEMt__lb_nkblm_I";
   const TAB_NAME = "FF_Events";
   const AUTO_REFRESH_MS = 60000;
+ 
 
   function getTodayIstIso() {
     const parts = new Intl.DateTimeFormat("en-CA", {
@@ -216,14 +217,42 @@
         </div>
 
         <div class="mt-4 flex items-center gap-2 sm:mt-0 sm:ml-6 sm:flex-none">
-          <button
+        
+          <!-- <button
             type="button"
             on:click={() => fetchForexEvents({ silent: false })}
             disabled={isLoading}
             class="block w-full cursor-pointer rounded-md bg-indigo-500 px-3.5 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
           >
+          
             {isLoading ? "Refreshing..." : "Refresh"}
-          </button>
+          </button> -->
+
+          <button
+          type="button"
+          on:click={() => fetchForexEvents({ silent: false })}
+          disabled={isLoading}
+          title="Refresh Now"
+          aria-label="Refresh Now"
+          class="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 p-2 text-zinc-200 shadow-sm transition hover:border-indigo-400 hover:bg-indigo-500/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5 {isLoading ? 'animate-spin text-indigo-300' : ''}"
+            aria-hidden="true"
+          >
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 16h5v5" />
+          </svg>
+        </button>
         </div>
       </div>
 

@@ -446,11 +446,6 @@
     fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, 1);
   }
 
-  function showAllDates() {
-    selectedDate = "";
-    fetchAndFilterData(selectedCoin, selectedMonth, "", 1);
-  }
-
   function goToPage(pageNum) {
     if (loading || pageNum < 1 || pageNum > totalPages) return;
     applyPageSlice(allFilteredRows, pageNum);
@@ -488,7 +483,7 @@
   $: pageNumbers = Array.from({ length: totalPages }, (_, idx) => idx + 1);
 </script>
 
-<main class=" bg-[#27272a] py-4 sm:py-6">
+<main class="bg-[#27272a] py-4 sm:py-6">
   <div class="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
     <!-- Top Header & Coin/Action Controls -->
     <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -496,7 +491,7 @@
         <h1 class="truncate text-base font-semibold text-white sm:text-lg">
           My Data Analytics ({selectedCoin} · {selectedMonth})
         </h1>
-        <p class="mt-1 text-xs text-zinc-100 sm:text-sm">
+        <p class="mt-1 text-xs text-zinc-300 sm:text-sm">
           {selectedDate ? `Date: ${selectedDate}` : "All dates in month"} ·
           Page {currentPage} of {totalPages} ({allFilteredRows.length} rows)
           {#if lastSyncedAt}
@@ -507,7 +502,7 @@
         </p>
       </div>
 
-      <div class="flex flex-wrap items-center gap-2 sm:flex-none">
+      <div class="flex items-center gap-2 sm:flex-none">
         <button
           type="button"
           on:click={() => switchCoin("BTC")}
@@ -533,24 +528,42 @@
           on:click={() =>
             fetchAndFilterData(selectedCoin, selectedMonth, selectedDate, currentPage)
           }
-          class="hidden cursor-pointer rounded-md bg-indigo-500 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 sm:block sm:w-auto"
+          disabled={loading}
+          title="Refresh Now"
+          aria-label="Refresh Now"
+          class="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md border border-zinc-700 bg-zinc-900 p-2 text-zinc-200 shadow-sm transition hover:border-indigo-400 hover:bg-indigo-500/20 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Refresh Now
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="h-5 w-5 {loading ? 'animate-spin text-indigo-300' : ''}"
+            aria-hidden="true"
+          >
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+            <path d="M16 16h5v5" />
+          </svg>
         </button>
       </div>
     </div>
 
     <!-- Top Month & Date Filter Bar -->
-    <div class="mt-4 flex flex-col gap-3 rounded-lg bg-[#27272a] px-3 py-3 shadow-sm ring-1 ring-inset ring-gray-200 sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
-      <div class="hidden items-center gap-2 sm:flex">
-        <label for="month-filter" class="text-sm font-medium text-zinc-100">
+    <div class="mt-4 flex flex-col gap-3 rounded-lg border border-zinc-700/90 bg-zinc-900/40 px-3 py-3 shadow-sm sm:mt-6 sm:flex-row sm:flex-wrap sm:items-center sm:px-4">
+      <div class="flex items-center gap-2">
+        <label for="month-filter" class="text-sm font-medium text-zinc-200">
           Month:
         </label>
         <select
           id="month-filter"
           value={selectedMonth}
           on:change={handleMonthChange}
-          class="rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-100 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+          class="cursor-pointer rounded-md border border-zinc-700 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-100 shadow-sm transition [color-scheme:dark] focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 focus:outline-none"
         >
           {#each monthOptions as m}
             <option value={m.value}>{m.label}</option>
@@ -559,7 +572,7 @@
       </div>
 
       <div class="flex flex-1 items-center gap-2 sm:flex-initial">
-        <label for="date-filter" class="text-sm font-medium text-zinc-100">
+        <label for="date-filter" class="text-sm font-medium text-zinc-200">
           Date:
         </label>
         <input
@@ -572,7 +585,7 @@
       </div>
     </div>
 
-    <!-- Scrollable Table Container with Sticky Header -->
+    <!-- Scrollable Table Container with Sticky Header & Sleek Dark Scrollbar -->
     <div class="mt-4 flow-root sm:mt-6">
       <div class="overflow-hidden rounded-lg border border-zinc-700 bg-[#27272a] shadow-md">
         {#if loading}
@@ -588,7 +601,7 @@
             No rows found{selectedDate ? ` for ${selectedDate}` : ""} in {selectedCoin}_{selectedMonth}.
           </div>
         {:else}
-          <div class="max-h-[44rem] overflow-auto sm:max-h-[52rem]">
+          <div class="custom-scrollbar max-h-[44rem] overflow-auto [color-scheme:dark] sm:max-h-[52rem]">
             <table class="min-w-full divide-y divide-zinc-700 bg-[#27272a]">
               <thead class="sticky top-0 z-10 bg-zinc-900/95 backdrop-blur-xs">
                 <tr class="divide-x divide-zinc-700/80">
@@ -660,7 +673,7 @@
         {/if}
 
         <!-- Pagination Footer with 1, 2, 3... buttons -->
-        <div class="flex flex-col gap-3 border-t border-zinc-700 bg-[#27272a] px-3 py-3 text-zinc-100 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div class="flex flex-col gap-3 border-t border-zinc-700 bg-zinc-900/40 px-3 py-3 text-zinc-100 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div class="text-center text-xs text-zinc-400 tabular-nums sm:text-left sm:text-sm">
             Showing <span class="font-semibold text-zinc-200">{rows.length}</span> of
             <span class="font-semibold text-zinc-200">{allFilteredRows.length}</span> rows
@@ -704,3 +717,32 @@
     </div>
   </div>
 </main>
+
+<style>
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #52525b #18181b;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #18181b;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #52525b;
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #71717a;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: #18181b;
+  }
+</style>
